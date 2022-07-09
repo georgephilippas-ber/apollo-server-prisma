@@ -1,4 +1,4 @@
-import {Encryption} from "../core/authentication/encryption/encryption";
+import {Encryption} from "../src/core/authentication/encryption/encryption";
 
 let encrypted_ = "random";
 

@@ -1,31 +1,32 @@
-import {combine, toInteger} from "../core/utilities/utilities";
+import {combine, toInteger} from "../src/core/utilities/utilities";
 
 describe("utilities", () =>
 {
     it("combine", () =>
     {
-        let obj1 = {
+        let first = {
             a: 1,
             b: "string",
             c: undefined,
             d: null
-        }
-        let obj2 = {
+        };
+
+        let second = {
             d: undefined,
             e: null,
             f: -1
-        }
+        };
 
-        expect(combine([obj1, obj2])).toHaveProperty(["a"]);
+        expect(combine([first, second])).toHaveProperty(["a"]);
 
-        expect(combine([obj1, obj2])).toHaveProperty(["b"]);
-        expect(combine([obj1, obj2])).toHaveProperty(["c"]);
-        expect(combine([obj1, obj2]).c).toBeUndefined();
-        expect(combine([obj1, obj2])).toHaveProperty(["d"]);
-        expect(combine([obj1, obj2])).toHaveProperty(["e"]);
-        expect(combine([obj1, obj2])).toHaveProperty(["f"]);
+        expect(combine([first, second])).toHaveProperty(["b"]);
+        expect(combine([first, second])).toHaveProperty(["c"]);
+        expect(combine([first, second]).c).toBeUndefined();
+        expect(combine([first, second])).toHaveProperty(["d"]);
+        expect(combine([first, second])).toHaveProperty(["e"]);
+        expect(combine([first, second])).toHaveProperty(["f"]);
 
-        expect(combine([obj1, obj2]).g).toBeUndefined();
+        expect(combine([first, second]).g).toBeUndefined();
     });
 
     it("toInteger", () =>

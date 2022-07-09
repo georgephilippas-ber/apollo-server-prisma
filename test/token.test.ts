@@ -1,4 +1,4 @@
-import {Manager_jwt} from "../core/authentication/token/token";
+import {Manager_jwt} from "../src/core/authentication/token/token";
 
 describe("Manager_jwt", () =>
 {
