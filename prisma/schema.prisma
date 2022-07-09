@@ -16,9 +16,11 @@ model Agent {
   forename String
   surname  String
 
-  username String
-  email    String
+  username String @unique
+  email    String @unique
 
   password_hash String
-  passkey_hash  String?
+  passkey_hash  String? @unique
+
+  active Boolean
 }

@@ -52,3 +52,8 @@ export function toInteger(object_: any): number | undefined
             return undefined;
     }
 }
+
+export function toProperCase(string_: string): string
+{
+    return string_.charAt(0).toUpperCase() + string_.slice(1).toLowerCase();
+}

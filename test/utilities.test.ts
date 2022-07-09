@@ -1,4 +1,4 @@
-import {combine, toInteger} from "../src/core/utilities/utilities";
+import {combine, toInteger, toProperCase} from "../src/core/utilities/utilities";
 
 describe("utilities", () =>
 {
@@ -36,5 +36,11 @@ describe("utilities", () =>
         expect(toInteger("100b")).toEqual(100);
         expect(toInteger("100b200")).toEqual(100);
         expect(toInteger("b100")).toBeUndefined();
+    });
+
+    it("toProperCase", () =>
+    {
+        expect(toProperCase("george")).toBe("George");
+        expect(toProperCase("")).toBe("");
     })
 });
