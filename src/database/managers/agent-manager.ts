@@ -1,4 +1,4 @@
-import {PrismaClient, Prisma} from "@prisma/client";
+import {PrismaClient, Prisma, Agent} from "@prisma/client";
 import {Encryption} from "../../core/authentication/encryption/encryption";
 
 import {faker} from "@faker-js/faker";
@@ -22,7 +22,7 @@ export class AgentManager
         this.prismaClient = prismaClient;
     }
 
-    async insertAgent(candidate_agent: candidate_agent_type_, active: boolean = true): Promise<Prisma.AgentCreateInput>
+    async insertAgent(candidate_agent: candidate_agent_type_, active: boolean = true): Promise<Agent>
     {
         return this.prismaClient.agent.create({
                 data:
@@ -37,6 +37,21 @@ export class AgentManager
                     }
             }
         )
+    }
+
+    async deleteByUsername(username: string): Promise<Agent>
+    {
+        return this.prismaClient.agent.delete({
+            where:
+                {
+                    username
+                }
+        });
+    }
+
+    async all(cardinality?: number): Promise<Agent[]>
+    {
+        return this.prismaClient.agent.findMany({take: cardinality});
     }
 }
 
@@ -57,12 +72,12 @@ function candidateAgentRandom(): candidate_agent_type_
     }
 }
 
-export async function createAgentRandom(agentManager: AgentManager): Promise<Prisma.AgentCreateInput>
+export async function createAgentRandom(agentManager: AgentManager): Promise<Agent>
 {
     return agentManager.insertAgent(candidateAgentRandom());
 }
 
-export async function createManyAgentRandom(agentManager: AgentManager, cardinality: number): Promise<Prisma.AgentCreateInput[]>
+export async function createManyAgentRandom(agentManager: AgentManager, cardinality: number): Promise<Agent[]>
 {
     return Promise.all(Array(cardinality).fill(0).map(value => createAgentRandom(agentManager)));
 }

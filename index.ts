@@ -7,4 +7,20 @@ Server.createAndStart();
 
 let agentManager = new AgentManager(prismaClient);
 
-createManyAgentRandom(agentManager, 4).then(value => console.log(value));
+async function main()
+{
+    await agentManager.insertAgent({
+        forename: "george",
+        surname: "george",
+        email: "george",
+        passkey: "george",
+        username: "george",
+        password: "george"
+    });
+    await createManyAgentRandom(agentManager, 4);
+    console.log(await agentManager.all());
+    await agentManager.deleteByUsername("george");
+    console.log(await agentManager.all());
+}
+
+main();
