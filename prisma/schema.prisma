@@ -6,12 +6,19 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = "file:./SQLite/database.db"
 }
 
 model Agent {
   id Int @id @default(autoincrement())
 
+  forename String
+  surname  String
 
+  username String
+  email    String
+
+  password_hash String
+  passkey_hash  String?
 }
