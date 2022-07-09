@@ -53,6 +53,11 @@ export class AgentManager
     {
         return this.prismaClient.agent.findMany({take: cardinality});
     }
+
+    async delete_all()
+    {
+        return this.prismaClient.agent.deleteMany();
+    }
 }
 
 function candidateAgentRandom(): candidate_agent_type_

@@ -9,6 +9,8 @@ let agentManager = new AgentManager(prismaClient);
 
 async function main()
 {
+    await agentManager.delete_all();
+
     await agentManager.insertAgent({
         forename: "george",
         surname: "george",
