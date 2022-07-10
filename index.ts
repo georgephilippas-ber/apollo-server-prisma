@@ -1,6 +1,6 @@
 import {Server} from "./src/server/apollo-server";
 
-import prismaClient from "./src/database/database-provider"
+import {prismaClient} from "./src/database/database-provider"
 import {AgentManager, createAgentRandom, createManyAgentRandom} from "./src/database/managers/agent-manager";
 
 Server.createAndStart();

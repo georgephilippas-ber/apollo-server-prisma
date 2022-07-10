@@ -1,4 +1,4 @@
-import {combine, toInteger, toProperCase} from "../src/core/utilities/utilities";
+import {combine, toInteger, toProperCase} from "../../src/core/utilities/utilities";
 
 describe("utilities", () =>
 {

@@ -39,6 +39,23 @@ export class AgentManager
         )
     }
 
+    async byUsername(username: string): Promise<Agent | null>
+    {
+        return this.prismaClient.agent.findUnique({where: {username}});
+    }
+
+    async byEmail(email: string): Promise<Agent | null>
+    {
+        return this.prismaClient.agent.findUnique({where: {email}});
+    }
+
+    async byPasskey(passkey: string): Promise<Agent | null>
+    {
+        let passkey_hash = Encryption.hash(passkey);
+
+        return this.prismaClient.agent.findUnique({where: {passkey_hash}})
+    }
+
     async deleteByUsername(username: string): Promise<Agent>
     {
         return this.prismaClient.agent.delete({
