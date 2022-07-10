@@ -5,6 +5,8 @@ import {buildSchema} from "graphql";
 import {readFileSync} from "fs";
 import {ApolloServerPluginDrainHttpServer} from "apollo-server-core";
 import {ResolversCollection} from "./resolvers-interface";
+import {Routers} from "./RESTful/router-interface";
+import {urlJoin} from "url-join-ts";
 
 export class Server
 {
@@ -15,7 +17,7 @@ export class Server
 
     port: number;
 
-    constructor(resolvers_collection_: ResolversCollection, port: number = 4_000)
+    constructor(resolvers_collection_: ResolversCollection, routers_: Routers, port: number = 4_000)
     {
         this.express_application = express();
 
@@ -30,6 +32,13 @@ export class Server
             cache: "bounded",
             plugins: [ApolloServerPluginDrainHttpServer({httpServer: this.http_server})]
         });
+
+        routers_.getRouters().forEach(value =>
+        {
+            this.express_application.use("/" + value.getEndpoint(), value.getRouter);
+
+            console.log(urlJoin("http://localhost:" + this.port, value.getEndpoint()));
+        })
     }
 
     async start(): Promise<Server>
