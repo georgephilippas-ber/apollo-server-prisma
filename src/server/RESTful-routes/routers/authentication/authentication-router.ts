@@ -92,6 +92,4 @@ export class AuthenticationRouter extends RouterClass
                 res.status(StatusCodes.BAD_REQUEST).send({status: "!identifier"});
         });
     }
-
-
 }

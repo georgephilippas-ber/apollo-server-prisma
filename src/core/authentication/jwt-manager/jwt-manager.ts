@@ -8,7 +8,7 @@ export type authentication_payload_type_ =
         refresh: boolean;
     }
 
-export class Manager_jwt
+export class JwtManager
 {
     secretOrPrivateKey: jwt.Secret;
 
