@@ -103,6 +103,7 @@ export class AuthenticationRouter extends RouterClass
                 res.status(StatusCodes.BAD_REQUEST).send({status: getReasonPhrase(StatusCodes.BAD_REQUEST)});
             else
             {
+                //TODO
                 res.send({well: (await this.agentManager.authenticate(req.body["credentials"]))?.username});
             }
         });
