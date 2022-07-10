@@ -1,7 +1,9 @@
 import {AgentManager, createManyAgentRandom} from "../../../src/database/managers/agent-manager";
 import {prismaClient} from "../../../src/database/database-provider";
 
-let agentManager = new AgentManager(prismaClient);
+import {JwtManager} from "../../../src/core/authentication/jwt-manager/jwt-manager";
+
+let agentManager = new AgentManager(prismaClient, new JwtManager());
 
 beforeAll(async () =>
 {

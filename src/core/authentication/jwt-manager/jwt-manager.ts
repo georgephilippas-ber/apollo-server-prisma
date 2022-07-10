@@ -52,6 +52,10 @@ export class JwtManager
         {
             return false;
         }
+    }
 
+    public getSecretOrPrivateKey()
+    {
+        return this.secretOrPrivateKey;
     }
 }
