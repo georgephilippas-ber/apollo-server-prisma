@@ -8,7 +8,7 @@ beforeAll(async () =>
     await agentManager.delete_all();
 
     await createManyAgentRandom(agentManager, 0x04);
-});
+}, 60_000);
 
 describe("agent-manager", () =>
 {
