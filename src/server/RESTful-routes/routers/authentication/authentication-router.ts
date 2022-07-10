@@ -134,6 +134,14 @@ export class AuthenticationRouter extends RouterClass
                     }
                 }
             }
-        })
+        });
+    }
+
+    logout()
+    {
+        this.express_router_.post("/logout", async (req, res) =>
+        {
+            
+        });
     }
 }
