@@ -87,7 +87,7 @@ function candidateAgentRandom(): candidate_agent_type_
     let password = username;
     let passkey = forename.toLowerCase() + surname.toLowerCase();
 
-    console.log(username, email, password, passkey);
+    console.log(forename, surname, username, email, password, passkey);
 
     return {
         forename, surname, username, email, password, passkey
