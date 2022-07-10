@@ -1,8 +1,9 @@
-import {PrismaClient, Prisma, Agent} from "@prisma/client";
+import {Agent, PrismaClient} from "@prisma/client";
 import {Encryption} from "../../core/authentication/encryption/encryption";
 
 import {faker} from "@faker-js/faker";
 import {isString_email} from "../../core/utilities/utilities";
+import {CRUD_operation_result_type_} from "../database-provider";
 
 export type candidate_agent_type_ =
     {
@@ -23,12 +24,6 @@ export const candidateAgent_withPasskey: candidate_agent_type_ =
         ...candidateAgent_withoutPasskey, passkey: ""
     };
 
-type CRUD_result_type_ =
-    {
-        error?: string;
-        agent?: Agent;
-    }
-
 export class AgentManager
 {
     prismaClient: PrismaClient;
@@ -43,7 +38,7 @@ export class AgentManager
         return this.prismaClient.agent.findMany({take: cardinality});
     }
 
-    async insertAgent(candidate_agent: candidate_agent_type_, active: boolean = true): Promise<CRUD_result_type_>
+    async insertAgent(candidate_agent: candidate_agent_type_, active: boolean = true): Promise<CRUD_operation_result_type_>
     {
         let error_: string[] = [];
 
@@ -60,7 +55,7 @@ export class AgentManager
         try
         {
             return {
-                agent:
+                payload:
                     await this.prismaClient.agent.create({
                             data:
                                 {
@@ -83,6 +78,11 @@ export class AgentManager
         }
     }
 
+    async byId(id: number): Promise<Agent | null>
+    {
+        return this.prismaClient.agent.findUnique({where: {id}});
+    }
+
     async byUsername(username: string): Promise<Agent | null>
     {
         return this.prismaClient.agent.findUnique({where: {username}});
@@ -100,14 +100,14 @@ export class AgentManager
         return this.prismaClient.agent.findUnique({where: {passkey_hash}})
     }
 
-    async deleteBy(identifier: string): Promise<CRUD_result_type_>
+    async deleteBy(identifier: string): Promise<CRUD_operation_result_type_>
     {
         let where_: any = isString_email(identifier) ? {username: identifier} : {email: identifier};
 
         try
         {
             return {
-                agent: await this.prismaClient.agent.delete({
+                payload: await this.prismaClient.agent.delete({
                     where: where_
                 })
             }
@@ -142,12 +142,12 @@ function candidateAgentRandom(): candidate_agent_type_
     }
 }
 
-export async function createAgentRandom(agentManager: AgentManager): Promise<CRUD_result_type_>
+export async function createAgentRandom(agentManager: AgentManager): Promise<CRUD_operation_result_type_>
 {
     return agentManager.insertAgent(candidateAgentRandom());
 }
 
-export async function createManyAgentRandom(agentManager: AgentManager, cardinality: number): Promise<CRUD_result_type_[]>
+export async function createManyAgentRandom(agentManager: AgentManager, cardinality: number): Promise<CRUD_operation_result_type_[]>
 {
     return Promise.all(Array(cardinality).fill(0).map(value => createAgentRandom(agentManager)));
 }
