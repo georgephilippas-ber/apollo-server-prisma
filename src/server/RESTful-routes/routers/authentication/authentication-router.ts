@@ -141,7 +141,11 @@ export class AuthenticationRouter extends RouterClass
     {
         this.express_router_.post("/logout", async (req, res) =>
         {
-            
+            if (specifies(req.headers, ["Authorization"]))
+            {
+
+            } else
+                res.status(StatusCodes.BAD_REQUEST).send({status: getReasonPhrase(StatusCodes.BAD_REQUEST)});
         });
     }
 }
