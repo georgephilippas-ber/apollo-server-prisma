@@ -9,10 +9,10 @@ export class AuthenticationRouter extends RouterClass
 
         this.express_router_.use(express.json());
 
-        this.assign();
+        this.use();
     }
 
-    assign()
+    use()
     {
         this.default();
     }

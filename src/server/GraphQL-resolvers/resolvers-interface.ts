@@ -1,4 +1,4 @@
-import {combine} from "../core/utilities/utilities";
+import {combine} from "../../core/utilities/utilities";
 
 type resolver_type_ = (parent: any, args: any, context: any, info: any) => any
 

@@ -1,7 +1,7 @@
-import {Resolvers} from "../../resolvers-interface";
+import {Resolvers} from "../resolvers-interface";
 import {AgentManager} from "../../../database/managers/agent-manager";
 
-import {resolvers_type_} from "../../resolvers-interface";
+import {resolvers_type_} from "../resolvers-interface";
 
 export class AgentResolvers extends Resolvers
 {
