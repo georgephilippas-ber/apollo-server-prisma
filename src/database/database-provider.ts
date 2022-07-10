@@ -4,6 +4,6 @@ export const prismaClient = new PrismaClient();
 
 export type CRUD_operation_result_type_ =
     {
-        error?: string;
+        error: string;
         payload?: Agent | Session;
     }

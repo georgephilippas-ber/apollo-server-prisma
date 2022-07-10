@@ -60,6 +60,7 @@ export class AgentManager
         try
         {
             return {
+                error: "",
                 payload:
                     await this.prismaClient.agent.create({
                             data:
@@ -112,6 +113,7 @@ export class AgentManager
         try
         {
             return {
+                error: "",
                 payload: await this.prismaClient.agent.delete({
                     where: where_
                 })

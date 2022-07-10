@@ -25,6 +25,7 @@ export class SessionManager
         try
         {
             return {
+                error: "",
                 payload: await this.prismaClient.session.create({
                     data:
                         {

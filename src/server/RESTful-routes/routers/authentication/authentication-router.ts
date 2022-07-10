@@ -3,23 +3,30 @@ import express from "express";
 import {
     AgentManager,
     candidate_agent_type_,
-    candidateAgent_withoutPasskey, candidateAgent_withPasskey
+    candidateAgent_withoutPasskey,
+    candidateAgent_withPasskey
 } from "../../../../database/managers/agent-manager";
 
-import {StatusCodes, getReasonPhrase} from 'http-status-codes';
+import {getReasonPhrase, StatusCodes} from 'http-status-codes';
 import {isolate, specifies} from "../../../../core/utilities/utilities";
+import {SessionManager} from "../../../../database/managers/session-manager";
+import {JwtManager} from "../../../../core/authentication/jwt-manager/jwt-manager";
 
 let activeDefault: boolean = true;
 
 export class AuthenticationRouter extends RouterClass
 {
     agentManager: AgentManager;
+    sessionManager: SessionManager;
+    jwtManager: JwtManager;
 
-    constructor(agentManager: AgentManager)
+    constructor(agentManager: AgentManager, sessionManager: SessionManager, jwtManager: JwtManager)
     {
         super("authentication");
 
         this.agentManager = agentManager;
+        this.sessionManager = sessionManager;
+        this.jwtManager = jwtManager;
 
         this.express_router_.use(express.json());
 
@@ -99,13 +106,34 @@ export class AuthenticationRouter extends RouterClass
     {
         this.express_router_.post("/login", async (req, res) =>
         {
-            if (!specifies(req.body, ["credentials"]) || !Array.isArray(req.body["credentials"]) || req.body["credentials"].length == 0)
+            if (!specifies(req.body, ["credentials"]) || !Array.isArray(req.body["credentials"]) || req.body["credentials"].filter(value => typeof value === "string").length == 0)
                 res.status(StatusCodes.BAD_REQUEST).send({status: getReasonPhrase(StatusCodes.BAD_REQUEST)});
             else
             {
-                //TODO
-                res.send({well: (await this.agentManager.authenticate(req.body["credentials"]))?.username});
+                let credentials_ = req.body["credentials"].filter(value => typeof value === "string");
+
+                let agent_ = await this.agentManager.authenticate(credentials_);
+
+                if (!agent_)
+                    res.status(StatusCodes.FORBIDDEN).send({status: getReasonPhrase(StatusCodes.FORBIDDEN)});
+                else
+                {
+                    let session_ = await this.sessionManager.createSession(agent_.id, 0xff);
+
+                    if (!session_.payload)
+                        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({status: session_.error});
+                    else
+                    {
+                        let token = this.jwtManager.produce({
+                            agentId: agent_.id,
+                            sessionId: session_.payload.id,
+                            refresh: true
+                        }, 0xff);
+
+                        res.status(StatusCodes.OK).send({token});
+                    }
+                }
             }
-        });
+        })
     }
 }
