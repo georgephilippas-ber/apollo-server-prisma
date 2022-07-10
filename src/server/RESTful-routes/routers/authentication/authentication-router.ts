@@ -41,6 +41,7 @@ export class AuthenticationRouter extends RouterClass
         this.delete();
 
         this.login();
+        this.logout();
     }
 
     default()
@@ -118,7 +119,7 @@ export class AuthenticationRouter extends RouterClass
                     res.status(StatusCodes.FORBIDDEN).send({status: getReasonPhrase(StatusCodes.FORBIDDEN)});
                 else
                 {
-                    let session_ = await this.sessionManager.createSession(agent_.id, 0xff);
+                    let session_ = await this.sessionManager.createSession(agent_.id, 0x0f);
 
                     if (!session_.payload)
                         res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({status: session_.error});
@@ -128,7 +129,7 @@ export class AuthenticationRouter extends RouterClass
                             agentId: agent_.id,
                             sessionId: session_.payload.id,
                             refresh: true
-                        }, 0xff);
+                        }, 0x0f);
 
                         res.status(StatusCodes.OK).send({token});
                     }
@@ -141,9 +142,12 @@ export class AuthenticationRouter extends RouterClass
     {
         this.express_router_.post("/logout", async (req, res) =>
         {
-            if (specifies(req.headers, ["Authorization"]))
-            {
+            console.log(req.headers);
 
+            if (specifies(req.headers, ["Authorization".toLowerCase()]))
+            {
+                //TODO: obtain, decode, verify, destroy session, respond
+                res.send(req.headers["Authorization".toLowerCase()]);
             } else
                 res.status(StatusCodes.BAD_REQUEST).send({status: getReasonPhrase(StatusCodes.BAD_REQUEST)});
         });
