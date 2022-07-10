@@ -19,7 +19,7 @@ export class SessionManager
     {
         if (!(await this.agentManager.byId(agent_id_)))
             return {
-                error: ""
+                error: "!Agent"
             };
 
         try
@@ -44,6 +44,23 @@ export class SessionManager
             return {
                 error: (e as Error).message
             }
+        }
+    }
+
+    async deleteSession(id: number)
+    {
+        try
+        {
+            return {
+                payload: await this.prismaClient.session.delete({
+                    where: {id}
+                })
+            }
+        } catch (e)
+        {
+            console.log((e as Error).message)
+
+            return {error: (e as Error).message};
         }
     }
 }
