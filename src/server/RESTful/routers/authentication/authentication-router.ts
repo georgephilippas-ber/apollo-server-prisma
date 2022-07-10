@@ -19,9 +19,9 @@ export class AuthenticationRouter extends RouterClass
 
     default()
     {
-        this.express_router_.all("/default", (req, res) =>
+        this.express_router_.all("/", (req, res) =>
         {
-            res.send(req.body);
+            res.send({...req.headers});
         })
     }
 }

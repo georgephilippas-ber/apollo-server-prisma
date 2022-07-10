@@ -12,11 +12,9 @@ let agentManager = new AgentManager(prismaClient);
 
 let resolversCollection = new ResolversCollection([new AgentResolvers(agentManager)]);
 
-let authenticationRouter = new AuthenticationRouter();
-
 seedDatabase(agentManager, true).then(async value =>
 {
-    let server_ = new Server(resolversCollection, new Routers([authenticationRouter]))
+    let server_ = new Server(resolversCollection, new Routers([new AuthenticationRouter()]))
 
     await server_.start();
 

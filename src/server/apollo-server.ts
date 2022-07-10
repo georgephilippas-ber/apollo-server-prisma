@@ -35,10 +35,10 @@ export class Server
 
         routers_.getRouters().forEach(value =>
         {
-            this.express_application.use("/" + value.getEndpoint(), value.getRouter);
+            this.express_application.use("/" + value.getEndpoint(), value.getRouter());
 
             console.log(urlJoin("http://localhost:" + this.port, value.getEndpoint()));
-        })
+        });
     }
 
     async start(): Promise<Server>
