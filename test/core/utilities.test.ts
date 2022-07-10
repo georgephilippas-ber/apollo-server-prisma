@@ -1,4 +1,4 @@
-import {combine, toInteger, toProperCase} from "../../src/core/utilities/utilities";
+import {combine, isString_email, toInteger, toProperCase} from "../../src/core/utilities/utilities";
 
 describe("utilities", () =>
 {
@@ -42,5 +42,12 @@ describe("utilities", () =>
     {
         expect(toProperCase("george")).toBe("George");
         expect(toProperCase("")).toBe("");
+    })
+
+    it("isString_email", () => {
+        expect(isString_email("g.com@com@")).toBeFalsy();
+        expect(isString_email("g.com@com")).toBeFalsy();
+        expect(isString_email("g.com@aldi.com")).toBeTruthy();
+        expect(isString_email("username")).toBeFalsy();
     })
 });

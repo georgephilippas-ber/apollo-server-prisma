@@ -14,7 +14,7 @@ let resolversCollection = new ResolversCollection([new AgentResolvers(agentManag
 
 seedDatabase(agentManager, true).then(async value =>
 {
-    let server_ = new Server(resolversCollection, new Routers([new AuthenticationRouter()]))
+    let server_ = new Server(resolversCollection, new Routers([new AuthenticationRouter(agentManager)]));
 
     await server_.start();
 

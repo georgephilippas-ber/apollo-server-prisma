@@ -11,6 +11,7 @@ export class RouterClass
         this.express_router_ = express.Router();
 
         this.endpoint_ = endpoint_;
+
     }
 
     getRouter(): Router

@@ -1,0 +1,20 @@
+### Send POST request with json body
+POST http://localhost:4000/authentication/register
+Content-Type: application/json
+
+{
+  "forename": "",
+  "surname": "",
+  "username": "georg",
+  "email": "georg",
+  "password": "georg",
+  "passkey": ""
+}
+
+### Send POST request with json body
+DELETE http://localhost:4000/authentication/delete
+Content-Type: application/json
+
+{
+  "identifier": "georg"
+}

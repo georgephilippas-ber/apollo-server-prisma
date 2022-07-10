@@ -13,8 +13,8 @@ datasource db {
 model Agent {
   id Int @id @default(autoincrement())
 
-  forename String
-  surname  String
+  forename String?
+  surname  String?
 
   username String @unique
   email    String @unique
