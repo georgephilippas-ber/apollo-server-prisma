@@ -7,11 +7,11 @@ export async function seedDatabase(agentManager: AgentManager, cardinality: numb
     await agentManager.insertAgent({
         forename: "Connor",
         surname: "Ledner",
-        username: "",
+        username: "connor_ledner",
         email: "connor.ledner@yahoo.com",
         password: "connor_ledner",
         passkey: "connorledner",
-    }).then(value => console.log(value.error));
+    });
 
     (await createManyAgentRandom(agentManager, cardinality - 1)).filter(value => value.error).forEach(value => console.log(value.error));
 }

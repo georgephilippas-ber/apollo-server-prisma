@@ -1,4 +1,15 @@
 type Query
 {
-    default: String
+    all(cardinality: Int): [Agent]
+}
+
+type Agent
+{
+    id: ID
+
+    forename: String
+    surname: String
+
+    username: String
+    email: String
 }

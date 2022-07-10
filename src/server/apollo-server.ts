@@ -4,6 +4,7 @@ import {ApolloServer} from "apollo-server-express";
 import {buildSchema} from "graphql";
 import {readFileSync} from "fs";
 import {ApolloServerPluginDrainHttpServer} from "apollo-server-core";
+import {ResolversCollection} from "./resolvers-interface";
 
 export class Server
 {
@@ -14,7 +15,7 @@ export class Server
 
     port: number;
 
-    constructor(resolvers: { Query: any }, port: number = 4_000)
+    constructor(resolvers_collection_: ResolversCollection, port: number = 4_000)
     {
         this.express_application = express();
 
@@ -24,7 +25,7 @@ export class Server
 
         this.apollo_server = new ApolloServer({
             typeDefs: buildSchema(readFileSync("./models/GraphQL/schema.graphql").toString("utf-8")),
-            resolvers: resolvers,
+            resolvers: resolvers_collection_.collectQueryResolvers(),
             csrfPrevention: true,
             cache: "bounded",
             plugins: [ApolloServerPluginDrainHttpServer({httpServer: this.http_server})]
@@ -54,20 +55,5 @@ export class Server
 
         await this.apollo_server.stop();
         this.http_server.close();
-    }
-
-    public static createAndStart(resolvers?: { Query: any }, port: number = 4_000)
-    {
-        (new Server(resolvers ?? {
-            Query: {
-                default: (parent: any, args: any, context: any, info: any) => JSON.stringify({
-                    context,
-                    args
-                })
-            }
-        }, port)).start().then(value => process.on("SIGINT", async () =>
-        {
-            await value.stop();
-        }));
     }
 }
