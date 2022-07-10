@@ -43,9 +43,12 @@ export class JwtManager
 
     isJwtToken(jsonwebtoken_: string, verify: boolean = false): boolean
     {
+        if (!jsonwebtoken_)
+            return false;
+
         try
         {
-            let payload_: any = verify ? jwt.verify(jsonwebtoken_, this.secretOrPrivateKey) : jwt.decode(jsonwebtoken_);
+            verify ? jwt.verify(jsonwebtoken_, this.secretOrPrivateKey) : jwt.decode(jsonwebtoken_);
 
             return true;
         } catch (e)

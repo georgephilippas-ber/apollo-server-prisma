@@ -145,7 +145,7 @@ export class AgentManager
             return agent_;
     }
 
-    async authenticateUsingPasskey(credentials: string[])
+    async authenticateUsingPasskey(credentials: string[]): Promise<Agent | null>
     {
         if (credentials.length < 1 || credentials.includes(""))
             return null;
@@ -153,20 +153,31 @@ export class AgentManager
         return this.byPasskey(credentials[0]);
     }
 
-    async authenticateUsingToken(credentials: string[])
+    async authenticateUsingToken(credentials: string[]): Promise<Agent | null>
     {
         if (credentials.length < 1 || credentials.includes(""))
             return null;
 
-        this.jwtManager.obtain(credentials[0], true);
+        let payload_ = this.jwtManager.obtain(credentials[0], true);
+
+        if (!payload_)
+            return null;
+
+        return this.byId(payload_.agentId);
     }
 
-    async authenticate(credentials: string[])
+    async authenticate(credentials: string[]): Promise<Agent | null>
     {
+        let agent_: Agent | null = null;
+
         if (credentials.length > 1)
-            return this.authenticateUsingPassword(credentials)
+            agent_ = await this.authenticateUsingPassword(credentials)
+        else if (this.jwtManager.isJwtToken(credentials[0]))
+            agent_ = await this.authenticateUsingToken(credentials);
         else
-            return this.authenticateUsingPasskey(credentials);
+            agent_ = await this.authenticateUsingPasskey(credentials);
+
+        return agent_?.active ? agent_ : null;
     }
 
     async delete_all()

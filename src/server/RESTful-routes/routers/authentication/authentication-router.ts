@@ -97,13 +97,13 @@ export class AuthenticationRouter extends RouterClass
 
     login()
     {
-        this.express_router_.all("/login", (req, res) =>
+        this.express_router_.post("/login", async (req, res) =>
         {
-            if (!specifies(req.body, ["credentials"]) || Array.isArray(req.body["credentials"]))
+            if (!specifies(req.body, ["credentials"]) || !Array.isArray(req.body["credentials"]) || req.body["credentials"].length == 0)
                 res.status(StatusCodes.BAD_REQUEST).send({status: getReasonPhrase(StatusCodes.BAD_REQUEST)});
             else
             {
-
+                res.send({well: (await this.agentManager.authenticate(req.body["credentials"]))?.username});
             }
         });
     }

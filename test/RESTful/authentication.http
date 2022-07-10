@@ -18,3 +18,11 @@ Content-Type: application/json
 {
   "identifier": "georg"
 }
+
+### Send POST request with json body
+POST http://localhost:4000/authentication/login
+Content-Type: application/json
+
+{
+  "credentials": ["georg", "georg"]
+}
