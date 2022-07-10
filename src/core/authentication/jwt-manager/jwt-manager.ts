@@ -4,7 +4,8 @@ import crypto from "node:crypto";
 
 export type authentication_payload_type_ =
     {
-        agentId: number | string;
+        agentId: number;
+        sessionId: number;
         refresh: boolean;
     }
 
@@ -24,19 +25,33 @@ export class JwtManager
         return jwt.sign(authentication_payload_, this.secretOrPrivateKey, options_);
     }
 
-    public obtain(jsonwebtoken_: string): authentication_payload_type_ | null
+    public obtain(jsonwebtoken_: string, verify: boolean = true): authentication_payload_type_ | null
     {
         try
         {
-            let payload_: any = jwt.verify(jsonwebtoken_, this.secretOrPrivateKey);
+            let payload_: any = verify ? jwt.verify(jsonwebtoken_, this.secretOrPrivateKey) : jwt.decode(jsonwebtoken_);
 
-            if (!specifies(payload_, ["agentId", "refresh"]))
+            if (!specifies(payload_, ["agentId", "sessionId", "refresh"]))
                 return null;
             else
-                return isolate(payload_, ["agentId", "refresh"]) as authentication_payload_type_;
+                return isolate(payload_, ["agentId", "sessionId", "refresh"]) as authentication_payload_type_;
         } catch (e)
         {
             return null;
         }
+    }
+
+    isJwtToken(jsonwebtoken_: string, verify: boolean = false): boolean
+    {
+        try
+        {
+            let payload_: any = verify ? jwt.verify(jsonwebtoken_, this.secretOrPrivateKey) : jwt.decode(jsonwebtoken_);
+
+            return true;
+        } catch (e)
+        {
+            return false;
+        }
+
     }
 }

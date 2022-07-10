@@ -4,6 +4,7 @@ import {Encryption} from "../../core/authentication/encryption/encryption";
 import {faker} from "@faker-js/faker";
 import {isString_email} from "../../core/utilities/utilities";
 import {CRUD_operation_result_type_} from "../database-provider";
+import {JwtManager} from "../../core/authentication/jwt-manager/jwt-manager";
 
 export type candidate_agent_type_ =
     {
@@ -28,9 +29,13 @@ export class AgentManager
 {
     prismaClient: PrismaClient;
 
-    constructor(prismaClient: PrismaClient)
+    jwtManager: JwtManager;
+
+    constructor(prismaClient: PrismaClient, jwtManager: JwtManager)
     {
         this.prismaClient = prismaClient;
+
+        this.jwtManager = jwtManager;
     }
 
     async all(cardinality?: number): Promise<Agent[]>
@@ -119,6 +124,51 @@ export class AgentManager
         }
     }
 
+    async authenticateUsingPassword(credentials: string[]): Promise<Agent | null>
+    {
+        let agent_: Agent | null;
+
+        if (credentials.length < 2 || credentials.includes(""))
+            return null;
+
+        if (isString_email(credentials[0]))
+            agent_ = await this.byEmail(credentials[0]);
+        else
+            agent_ = await this.byUsername(credentials[0]);
+
+        if (!agent_)
+            return null;
+
+        if (!Encryption.verify(credentials[1], agent_.password_hash))
+            return null;
+        else
+            return agent_;
+    }
+
+    async authenticateUsingPasskey(credentials: string[])
+    {
+        if (credentials.length < 1 || credentials.includes(""))
+            return null;
+
+        return this.byPasskey(credentials[0]);
+    }
+
+    async authenticateUsingToken(credentials: string[])
+    {
+        if (credentials.length < 1 || credentials.includes(""))
+            return null;
+
+        this.jwtManager.obtain(credentials[0], true);
+    }
+
+    async authenticate(credentials: string[])
+    {
+        if (credentials.length > 1)
+            return this.authenticateUsingPassword(credentials)
+        else
+            return this.authenticateUsingPasskey(credentials);
+    }
+
     async delete_all()
     {
         return this.prismaClient.agent.deleteMany();
@@ -132,8 +182,7 @@ function candidateAgentRandom(): candidate_agent_type_
     let username = faker.internet.userName(forename, surname).toLowerCase();
     let email = faker.internet.email(forename, surname).toLowerCase();
 
-    let password = username;
-    let passkey = forename.toLowerCase() + surname.toLowerCase();
+    let password = username, passkey = forename.toLowerCase() + surname.toLowerCase();
 
     console.log(forename, surname, username, email, password, passkey);
 

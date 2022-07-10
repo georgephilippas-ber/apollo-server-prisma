@@ -32,6 +32,8 @@ export class AuthenticationRouter extends RouterClass
 
         this.register();
         this.delete();
+
+        this.login();
     }
 
     default()
@@ -90,6 +92,19 @@ export class AuthenticationRouter extends RouterClass
                     res.status(StatusCodes.BAD_REQUEST).send({status: "!string"});
             } else
                 res.status(StatusCodes.BAD_REQUEST).send({status: "!identifier"});
+        });
+    }
+
+    login()
+    {
+        this.express_router_.all("/login", (req, res) =>
+        {
+            if (!specifies(req.body, ["credentials"]) || Array.isArray(req.body["credentials"]))
+                res.status(StatusCodes.BAD_REQUEST).send({status: getReasonPhrase(StatusCodes.BAD_REQUEST)});
+            else
+            {
+
+            }
         });
     }
 }
