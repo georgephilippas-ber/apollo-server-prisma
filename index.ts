@@ -8,17 +8,21 @@ import {AgentResolvers} from "./src/server/GraphQL-resolvers/agent-resolvers/age
 import {AuthenticationRouter} from "./src/server/RESTful-routes/routers/authentication/authentication-router";
 import {Routers} from "./src/server/RESTful-routes/router-interface";
 import {JwtManager} from "./src/core/authentication/jwt-manager/jwt-manager";
+import {SessionManager} from "./src/database/managers/session-manager";
 
 let jwtManager = new JwtManager();
 
 let agentManager = new AgentManager(prismaClient, jwtManager);
+let sessionManager = new SessionManager(prismaClient, agentManager);
+
+
 console.log(jwtManager.getSecretOrPrivateKey());
 
 let resolversCollection = new ResolversCollection([new AgentResolvers(agentManager)]);
 
 seedDatabase(agentManager, true).then(async value =>
 {
-    let server_ = new Server(resolversCollection, new Routers([new AuthenticationRouter(agentManager)]));
+    let server_ = new Server(resolversCollection, new Routers([new AuthenticationRouter(agentManager, sessionManager, jwtManager)]));
 
     await server_.start();
 
