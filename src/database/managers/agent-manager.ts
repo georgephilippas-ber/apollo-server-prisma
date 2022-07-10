@@ -13,6 +13,12 @@ export type candidate_agent_type_ =
         passkey?: string;
     }
 
+type insertAgent_result_type_ =
+    {
+        error?: string;
+        agent?: Agent;
+    }
+
 export class AgentManager
 {
     prismaClient: PrismaClient;
@@ -22,21 +28,39 @@ export class AgentManager
         this.prismaClient = prismaClient;
     }
 
-    async insertAgent(candidate_agent: candidate_agent_type_, active: boolean = true): Promise<Agent>
+    async insertAgent(candidate_agent: candidate_agent_type_, active: boolean = true): Promise<insertAgent_result_type_>
     {
-        return this.prismaClient.agent.create({
-                data:
-                    {
-                        forename: candidate_agent.forename,
-                        surname: candidate_agent.surname,
-                        username: candidate_agent.username,
-                        email: candidate_agent.email,
-                        password_hash: Encryption.hash(candidate_agent.password),
-                        passkey_hash: candidate_agent.passkey ? Encryption.hash(candidate_agent.passkey) : undefined,
-                        active
-                    }
+        if (!candidate_agent.username)
+            return {error: "!username"}
+        else if (!candidate_agent.email)
+            return {error: "!email"}
+        else if (!candidate_agent.password)
+            return {error: "!password"}
+
+        try
+        {
+            return {
+                agent:
+                    await this.prismaClient.agent.create({
+                            data:
+                                {
+                                    forename: candidate_agent.forename,
+                                    surname: candidate_agent.surname,
+                                    username: candidate_agent.username,
+                                    email: candidate_agent.email,
+                                    password_hash: Encryption.hash(candidate_agent.password),
+                                    passkey_hash: candidate_agent.passkey ? Encryption.hash(candidate_agent.passkey) : undefined,
+                                    active
+                                }
+                        }
+                    )
             }
-        )
+        } catch (e)
+        {
+            console.log((e as Error).message)
+
+            return {error: (e as Error).message};
+        }
     }
 
     async byUsername(username: string): Promise<Agent | null>
@@ -94,12 +118,12 @@ function candidateAgentRandom(): candidate_agent_type_
     }
 }
 
-export async function createAgentRandom(agentManager: AgentManager): Promise<Agent>
+export async function createAgentRandom(agentManager: AgentManager): Promise<insertAgent_result_type_>
 {
     return agentManager.insertAgent(candidateAgentRandom());
 }
 
-export async function createManyAgentRandom(agentManager: AgentManager, cardinality: number): Promise<Agent[]>
+export async function createManyAgentRandom(agentManager: AgentManager, cardinality: number): Promise<insertAgent_result_type_[]>
 {
     return Promise.all(Array(cardinality).fill(0).map(value => createAgentRandom(agentManager)));
 }
