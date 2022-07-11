@@ -27,6 +27,9 @@ export class JwtManager
 
     public obtain(jsonwebtoken_: string, verify: boolean = true): authentication_payload_type_ | null
     {
+        if (!jsonwebtoken_)
+            return null;
+
         try
         {
             let payload_: any = verify ? jwt.verify(jsonwebtoken_, this.secretOrPrivateKey) : jwt.decode(jsonwebtoken_);

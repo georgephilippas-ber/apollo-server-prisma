@@ -1,6 +1,7 @@
-import {PrismaClient} from "@prisma/client";
+import {PrismaClient, Session} from "@prisma/client";
 import {AgentManager} from "./agent-manager";
 import {CRUD_operation_result_type_} from "../database-provider";
+import moment from "moment";
 
 export class SessionManager
 {
@@ -15,7 +16,12 @@ export class SessionManager
         this.agentManager = agentManager;
     }
 
-    async createSession(agent_id_: number, expiresIn?: number): Promise<CRUD_operation_result_type_>
+    all(): Promise<Session []>
+    {
+        return this.prismaClient.session.findMany();
+    }
+
+    async createSession(agent_id_: number, expiresIn: number): Promise<CRUD_operation_result_type_>
     {
         if (!(await this.agentManager.byId(agent_id_)))
             return {
@@ -29,7 +35,7 @@ export class SessionManager
                 payload: await this.prismaClient.session.create({
                     data:
                         {
-                            expiresIn: expiresIn,
+                            expiresAt: moment().add(expiresIn, "minutes").toDate(),
                             Agent:
                                 {
                                     connect:
@@ -48,11 +54,12 @@ export class SessionManager
         }
     }
 
-    async deleteSession(id: number)
+    async deleteSessionById(id: number): Promise<CRUD_operation_result_type_>
     {
         try
         {
             return {
+                error: "",
                 payload: await this.prismaClient.session.delete({
                     where: {id}
                 })
@@ -63,5 +70,33 @@ export class SessionManager
 
             return {error: (e as Error).message};
         }
+    }
+
+    valid(session: Session, agent_id?: number)
+    {
+        return moment(session.expiresAt) < moment() && (agent_id ? session.agentId == agent_id : true);
+    }
+
+    async isSessionValid(id: number, agent_id?: number): Promise<boolean> //found && !expired && if agent_id_ does it correspond to agent
+    {
+        let session_ = await this.prismaClient.session.findUnique({where: {id}});
+
+        if (!session_)
+            return false;
+        else
+            return this.valid(session_, agent_id);
+    }
+
+    async deleteExpiredSessions(agent_id: number): Promise<number>
+    {
+        return (await this.prismaClient.session.deleteMany({
+            where:
+                {
+                    agentId: agent_id,
+                    expiresAt: {
+                        lte: moment().toDate()
+                    }
+                }
+        })).count;
     }
 }

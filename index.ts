@@ -10,24 +10,30 @@ import {Routers} from "./src/server/RESTful-routes/router-interface";
 import {JwtManager} from "./src/core/authentication/jwt-manager/jwt-manager";
 import {SessionManager} from "./src/database/managers/session-manager";
 
-let jwtManager = new JwtManager();
 
-let agentManager = new AgentManager(prismaClient, jwtManager);
-let sessionManager = new SessionManager(prismaClient, agentManager);
-
-
-console.log(jwtManager.getSecretOrPrivateKey());
-
-let resolversCollection = new ResolversCollection([new AgentResolvers(agentManager)]);
-
-seedDatabase(agentManager, true).then(async value =>
+function server()
 {
-    let server_ = new Server(resolversCollection, new Routers([new AuthenticationRouter(agentManager, sessionManager, jwtManager)]));
 
-    await server_.start();
+    let jwtManager = new JwtManager();
 
-    process.on("SIGINT", async args =>
+    let agentManager = new AgentManager(prismaClient, jwtManager);
+    let sessionManager = new SessionManager(prismaClient, agentManager);
+
+    console.log(jwtManager.getSecretOrPrivateKey());
+
+    let resolversCollection = new ResolversCollection([new AgentResolvers(agentManager)]);
+
+    seedDatabase(agentManager, true).then(async value =>
     {
-        await server_.stop();
+        let server_ = new Server(resolversCollection, new Routers([new AuthenticationRouter(agentManager, sessionManager, jwtManager)]));
+
+        await server_.start();
+
+        process.on("SIGINT", async args =>
+        {
+            await server_.stop();
+        });
     });
-});
+}
+
+server();

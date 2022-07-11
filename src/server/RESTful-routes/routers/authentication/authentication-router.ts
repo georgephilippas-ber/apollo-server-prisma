@@ -1,5 +1,5 @@
 import {RouterClass} from "../../router-interface";
-import express from "express";
+import express, {NextFunction, Request, Response} from "express";
 import {
     AgentManager,
     candidate_agent_type_,
@@ -11,8 +11,44 @@ import {getReasonPhrase, StatusCodes} from 'http-status-codes';
 import {isolate, specifies} from "../../../../core/utilities/utilities";
 import {SessionManager} from "../../../../database/managers/session-manager";
 import {JwtManager} from "../../../../core/authentication/jwt-manager/jwt-manager";
+import {Session} from "@prisma/client";
+
+import morgan from "morgan";
+import cors from 'cors';
+import {csc} from "mathjs";
 
 let activeDefault: boolean = true;
+
+let session_duration_: number = 0x02;
+
+export function credentials_middleware(jwtManager: JwtManager)
+{
+    function middleware(req: Request, res: Response, next: NextFunction)
+    {
+        if (specifies(req.headers, ["Authorization".toLowerCase()]))
+        {
+            let token_: string = ((req.headers["Authorization".toLowerCase()] as string).split(" "))[1];
+
+            if (token_)
+            {
+                let authentication_payload_ = jwtManager.obtain(token_);
+
+                if (authentication_payload_)
+                {
+                    req.body = {
+                        ...req.body,
+                        agentId: authentication_payload_.agentId,
+                        sessionId: authentication_payload_.sessionId
+                    }
+                }
+            }
+        }
+
+        next();
+    }
+
+    return middleware;
+}
 
 export class AuthenticationRouter extends RouterClass
 {
@@ -28,7 +64,11 @@ export class AuthenticationRouter extends RouterClass
         this.sessionManager = sessionManager;
         this.jwtManager = jwtManager;
 
+        this.express_router_.use(morgan("short"));
+        this.express_router_.use(cors());
         this.express_router_.use(express.json());
+
+        this.express_router_.use(credentials_middleware(jwtManager));
 
         this.use();
     }
@@ -119,7 +159,7 @@ export class AuthenticationRouter extends RouterClass
                     res.status(StatusCodes.FORBIDDEN).send({status: getReasonPhrase(StatusCodes.FORBIDDEN)});
                 else
                 {
-                    let session_ = await this.sessionManager.createSession(agent_.id, 0x0f);
+                    let session_ = await this.sessionManager.createSession(agent_.id, session_duration_);
 
                     if (!session_.payload)
                         res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({status: session_.error});
@@ -129,10 +169,12 @@ export class AuthenticationRouter extends RouterClass
                             agentId: agent_.id,
                             sessionId: session_.payload.id,
                             refresh: true
-                        }, 0x0f);
+                        }, session_duration_);
 
                         res.status(StatusCodes.OK).send({token});
                     }
+
+                    await this.sessionManager.deleteExpiredSessions(agent_.id);
                 }
             }
         });
@@ -142,15 +184,21 @@ export class AuthenticationRouter extends RouterClass
     {
         this.express_router_.post("/logout", async (req, res) =>
         {
-            console.log(req.headers);
-
             if (specifies(req.headers, ["Authorization".toLowerCase()]))
             {
-                let jsonwebtoken_ = req.headers["Authorization".toLowerCase()] as string;
+                let jwt_payload_ = this.jwtManager.obtain((req.headers["Authorization".toLowerCase()] as string).split(" ")[1]);
 
+                if (!jwt_payload_)
+                    res.status(StatusCodes.UNAUTHORIZED).send({status: getReasonPhrase(StatusCodes.UNAUTHORIZED)});
+                else
+                {
+                    let session_: Session | null = (await this.sessionManager.deleteSessionById(jwt_payload_.sessionId)).payload;
 
-                //TODO: obtain, decode, verify, destroy session, respond
-                res.send(req.headers["Authorization".toLowerCase()]);
+                    if (!session_ || (session_.agentId !== jwt_payload_.agentId))
+                        res.status(StatusCodes.CONFLICT).send({status: "invalid session"});
+                    else
+                        res.status(StatusCodes.OK).send();
+                }
             } else
                 res.status(StatusCodes.BAD_REQUEST).send({status: getReasonPhrase(StatusCodes.BAD_REQUEST)});
         });

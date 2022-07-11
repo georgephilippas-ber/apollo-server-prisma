@@ -31,7 +31,7 @@ model Session {
   id Int @id @default(autoincrement())
 
   createdAt DateTime @default(now())
-  expiresIn Int?
+  expiresAt DateTime
 
   Agent   Agent @relation(fields: [agentId], references: [id])
   agentId Int
