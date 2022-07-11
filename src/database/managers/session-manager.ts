@@ -74,7 +74,7 @@ export class SessionManager
 
     valid(session: Session, agent_id?: number)
     {
-        return moment(session.expiresAt) < moment() && (agent_id ? session.agentId == agent_id : true);
+        return moment(session.expiresAt) > moment() && (agent_id ? session.agentId == agent_id : true);
     }
 
     async isSessionValid(id: number, agent_id?: number): Promise<boolean> //found && !expired && if agent_id_ does it correspond to agent

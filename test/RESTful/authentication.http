@@ -30,7 +30,7 @@ Content-Type: application/json
 ###
 POST http://localhost:4000/authentication/logout
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZ2VudElkIjoxLCJzZXNzaW9uSWQiOjYsInJlZnJlc2giOnRydWUsImlhdCI6MTY1NzUzNDc1NiwiZXhwIjoxNjU3NTM0ODc2fQ.l8rLcE3ix1WGy3YThSJvCa40G5tCxUGHr5snNBqPk0E
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZ2VudElkIjoxLCJzZXNzaW9uSWQiOjE2LCJyZWZyZXNoIjp0cnVlLCJpYXQiOjE2NTc1Mzg0MTcsImV4cCI6MTY1NzUzODUzN30.32cmQ9dsEmq4yNB25BXX_7sIGraHC5MfvbW2riMUb08
 
 {
 

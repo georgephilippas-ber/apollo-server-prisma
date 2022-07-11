@@ -5,7 +5,10 @@ import {AgentManager} from "./src/database/managers/agent-manager";
 import {seedDatabase} from "./seed/seed";
 import {ResolversCollection} from "./src/server/GraphQL-resolvers/resolvers-interface";
 import {AgentResolvers} from "./src/server/GraphQL-resolvers/agent-resolvers/agent-resolvers";
-import {AuthenticationRouter} from "./src/server/RESTful-routes/routers/authentication/authentication-router";
+import {
+    AuthenticationRouter,
+    authenticationMiddleware
+} from "./src/server/RESTful-routes/routers/authentication/authentication-router";
 import {Routers} from "./src/server/RESTful-routes/router-interface";
 import {JwtManager} from "./src/core/authentication/jwt-manager/jwt-manager";
 import {SessionManager} from "./src/database/managers/session-manager";

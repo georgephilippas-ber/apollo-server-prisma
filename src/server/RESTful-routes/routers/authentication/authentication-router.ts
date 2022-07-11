@@ -15,15 +15,14 @@ import {Session} from "@prisma/client";
 
 import morgan from "morgan";
 import cors from 'cors';
-import {csc} from "mathjs";
 
 let activeDefault: boolean = true;
 
 let session_duration_: number = 0x02;
 
-export function credentials_middleware(jwtManager: JwtManager)
+export function authenticationMiddleware(sessionManager: SessionManager, jwtManager: JwtManager)
 {
-    function middleware(req: Request, res: Response, next: NextFunction)
+    async function middleware(req: Request, res: Response, next: NextFunction)
     {
         if (specifies(req.headers, ["Authorization".toLowerCase()]))
         {
@@ -35,10 +34,14 @@ export function credentials_middleware(jwtManager: JwtManager)
 
                 if (authentication_payload_)
                 {
-                    req.body = {
-                        ...req.body,
-                        agentId: authentication_payload_.agentId,
-                        sessionId: authentication_payload_.sessionId
+                    if (await sessionManager.isSessionValid(authentication_payload_.sessionId, authentication_payload_.agentId))
+                    {
+                        req.body =
+                            {
+                                ...req.body,
+                                agentId: authentication_payload_.agentId,
+                                sessionId: authentication_payload_.sessionId
+                            }
                     }
                 }
             }
@@ -67,8 +70,7 @@ export class AuthenticationRouter extends RouterClass
         this.express_router_.use(morgan("short"));
         this.express_router_.use(cors());
         this.express_router_.use(express.json());
-
-        this.express_router_.use(credentials_middleware(jwtManager));
+        this.express_router_.use(authenticationMiddleware(sessionManager, jwtManager));
 
         this.use();
     }
@@ -184,6 +186,8 @@ export class AuthenticationRouter extends RouterClass
     {
         this.express_router_.post("/logout", async (req, res) =>
         {
+            console.log(req.body.agentId, req.body.sessionId);
+
             if (specifies(req.headers, ["Authorization".toLowerCase()]))
             {
                 let jwt_payload_ = this.jwtManager.obtain((req.headers["Authorization".toLowerCase()] as string).split(" ")[1]);
