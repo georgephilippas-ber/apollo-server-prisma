@@ -8,7 +8,7 @@ import {
 } from "../../../../database/managers/agent-manager";
 
 import {getReasonPhrase, StatusCodes} from 'http-status-codes';
-import {isolate, specifies, toInteger} from "../../../../core/utilities/utilities";
+import {isolate, specifies} from "../../../../core/utilities/utilities";
 import {SessionManager} from "../../../../database/managers/session-manager";
 import {JwtManager} from "../../../../core/authentication/jwt-manager/jwt-manager";
 import {Session} from "@prisma/client";
@@ -50,8 +50,7 @@ export function authorizationJsonWebTokenMiddleware(jwtManager: JwtManager)
     return middleware;
 }
 
-
-async function createSession(agentId: number, sessionManager: SessionManager, jwtManager: JwtManager, jwtPayloadContents: object = {}, response_: Response)
+async function createSession(agentId: number, sessionManager: SessionManager, jwtManager: JwtManager, response_: Response, additionalJSONResponseContents: object = {})
 {
     let session_ = await sessionManager.createSession(agentId, session_duration_);
 
@@ -63,10 +62,9 @@ async function createSession(agentId: number, sessionManager: SessionManager, jw
             agentId: agentId,
             sessionId: session_.payload.id,
             refresh: true,
-            ...jwtPayloadContents
         }, session_duration_);
 
-        response_.status(StatusCodes.OK).send({token});
+        response_.status(StatusCodes.OK).send({token, ...additionalJSONResponseContents});
     }
 
     await sessionManager.deleteExpiredSessions(agentId);
@@ -89,7 +87,7 @@ export class AuthenticationRouter extends RouterClass
         this.express_router_.use(morgan("short"));
         this.express_router_.use(cors());
         this.express_router_.use(express.json());
-        this.express_router_.use(authorizationJsonWebTokenMiddleware(sessionManager, jwtManager));
+        this.express_router_.use(authorizationJsonWebTokenMiddleware(jwtManager));
 
         this.use();
     }
@@ -181,12 +179,12 @@ export class AuthenticationRouter extends RouterClass
                 if (!agent_)
                     res.status(StatusCodes.FORBIDDEN).send({status: getReasonPhrase(StatusCodes.FORBIDDEN)});
                 else
-                    await createSession(agent_.id, this.sessionManager, this.jwtManager, {
+                    await createSession(agent_.id, this.sessionManager, this.jwtManager, res, {
                         username: agent_.username,
                         email: agent_.email,
                         forename: agent_.forename,
                         surname: agent_.surname
-                    }, res);
+                    });
             }
         });
     }
@@ -219,12 +217,18 @@ export class AuthenticationRouter extends RouterClass
 
     refresh()
     {
-        this.express_router_.post("/refresh", async (req, res, next) =>
+        this.express_router_.post("/refresh", async (req, res) =>
         {
             if (specifies(req.body, ["agentId", "sessionId"]))
             {
                 await this.sessionManager.deleteSessionById(req.body["sessionId"]);
 
+                let agent_ = await this.agentManager.byId(req.body["agentId"]);
+
+                if (!agent_)
+                    res.status(StatusCodes.FORBIDDEN).send({status: getReasonPhrase(StatusCodes.FORBIDDEN)});
+                else
+                    await createSession(agent_.id, this.sessionManager, this.jwtManager, res);
             } else
                 res.status(StatusCodes.FORBIDDEN).send();
         });
