@@ -20,7 +20,7 @@ let activeDefault: boolean = true;
 
 let session_duration_: number = 0x02;
 
-export function authenticationMiddleware(sessionManager: SessionManager, jwtManager: JwtManager)
+export function authorizationMiddleware(sessionManager: SessionManager, jwtManager: JwtManager)
 {
     async function middleware(req: Request, res: Response, next: NextFunction)
     {
@@ -70,7 +70,7 @@ export class AuthenticationRouter extends RouterClass
         this.express_router_.use(morgan("short"));
         this.express_router_.use(cors());
         this.express_router_.use(express.json());
-        this.express_router_.use(authenticationMiddleware(sessionManager, jwtManager));
+        this.express_router_.use(authorizationMiddleware(sessionManager, jwtManager));
 
         this.use();
     }
@@ -84,6 +84,8 @@ export class AuthenticationRouter extends RouterClass
 
         this.login();
         this.logout();
+
+        this.refresh();
     }
 
     default()
@@ -205,6 +207,18 @@ export class AuthenticationRouter extends RouterClass
                 }
             } else
                 res.status(StatusCodes.BAD_REQUEST).send({status: getReasonPhrase(StatusCodes.BAD_REQUEST)});
+        });
+    }
+
+    refresh()
+    {
+        this.express_router_.post("/refresh", (req, res, next) =>
+        {
+            if (req.body["agentId"] && req.body["sessionId"])
+            {
+                res.send("All good here");
+            } else
+                res.status(StatusCodes.FORBIDDEN).send();
         });
     }
 }
