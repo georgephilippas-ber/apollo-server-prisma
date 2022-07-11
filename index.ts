@@ -5,10 +5,7 @@ import {AgentManager} from "./src/database/managers/agent-manager";
 import {seedDatabase} from "./seed/seed";
 import {ResolversCollection} from "./src/server/GraphQL-resolvers/resolvers-interface";
 import {AgentResolvers} from "./src/server/GraphQL-resolvers/agent-resolvers/agent-resolvers";
-import {
-    AuthorizationRouter,
-    authorizationJsonWebTokenMiddleware
-} from "./src/server/RESTful-routes/routers/authorization/authorization-router";
+import {AuthorizationRouter} from "./src/server/RESTful-routes/routers/authorization/authorization-router";
 import {Routers} from "./src/server/RESTful-routes/router-interface";
 import {JwtManager} from "./src/core/authorization/jwt-manager/jwt-manager";
 import {SessionManager} from "./src/database/managers/session-manager";
