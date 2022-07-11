@@ -66,8 +66,6 @@ export class SessionManager
             }
         } catch (e)
         {
-            console.log((e as Error).message)
-
             return {error: (e as Error).message};
         }
     }

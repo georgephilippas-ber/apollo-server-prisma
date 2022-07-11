@@ -18,7 +18,7 @@ import cors from 'cors';
 
 let activeDefault: boolean = true;
 
-let session_duration_: number = 0x02;
+let session_duration_: number = 0x0f;
 
 export function authorizationJsonWebTokenMiddleware(jwtManager: JwtManager)
 {
@@ -50,7 +50,7 @@ export function authorizationJsonWebTokenMiddleware(jwtManager: JwtManager)
     return middleware;
 }
 
-async function createSession(agentId: number, sessionManager: SessionManager, jwtManager: JwtManager, response_: Response, additionalJSONResponseContents: object = {})
+async function createSession(agentId: number, sessionManager: SessionManager, jwtManager: JwtManager, response_: Response, additionalResponseBodyContents: object = {})
 {
     let session_ = await sessionManager.createSession(agentId, session_duration_);
 
@@ -64,7 +64,7 @@ async function createSession(agentId: number, sessionManager: SessionManager, jw
             refresh: true,
         }, session_duration_);
 
-        response_.status(StatusCodes.OK).send({token, ...additionalJSONResponseContents});
+        response_.status(StatusCodes.OK).send({token, ...additionalResponseBodyContents});
     }
 
     await sessionManager.deleteExpiredSessions(agentId);
@@ -206,7 +206,7 @@ export class AuthenticationRouter extends RouterClass
                     let session_: Session | null = (await this.sessionManager.deleteSessionById(jwt_payload_.sessionId)).payload;
 
                     if (!session_ || (session_.agentId !== jwt_payload_.agentId))
-                        res.status(StatusCodes.CONFLICT).send({status: "invalid session"});
+                        res.status(StatusCodes.OK).send({status: "invalid session"});
                     else
                         res.status(StatusCodes.OK).send();
                 }
