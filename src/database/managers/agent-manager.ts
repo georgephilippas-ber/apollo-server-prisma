@@ -160,12 +160,12 @@ export class AgentManager
         if (credentials.length < 1 || credentials.includes(""))
             return null;
 
-        let payload_ = this.jwtManager.obtain(credentials[0], true);
+        let jwtDecode = this.jwtManager.decode(credentials[0]);
 
-        if (!payload_)
+        if (jwtDecode.valid && jwtDecode.payload)
+            return this.byId(jwtDecode.payload.agentId);
+        else
             return null;
-
-        return this.byId(payload_.agentId);
     }
 
     async authenticate(credentials: string[]): Promise<Agent | null>
@@ -174,7 +174,7 @@ export class AgentManager
 
         if (credentials.length > 1)
             agent_ = await this.authenticateUsingPassword(credentials)
-        else if (this.jwtManager.isJwtToken(credentials[0]))
+        else if (this.jwtManager.decode(credentials[0]).isAuthorizationPayload)
             agent_ = await this.authenticateUsingToken(credentials);
         else
             agent_ = await this.authenticateUsingPasskey(credentials);

@@ -24,22 +24,20 @@ export function authorizationJsonWebTokenMiddleware(jwtManager: JwtManager)
 {
     async function middleware(req: Request, res: Response, next: NextFunction)
     {
-        if (specifies(req.headers, ["Authorization".toLowerCase()]))
+        let token_: string = getAuthorizationToken(req);
+
+        if (token_)
         {
-            let token_: string = ((req.headers["Authorization".toLowerCase()] as string).split(" "))[1];
+            let jwtDecode = jwtManager.decode(token_);
 
-            if (token_)
+            if (jwtDecode.isAuthorizationPayload && jwtDecode.payload)
             {
-                let authentication_payload_ = jwtManager.obtain(token_);
+                req.body = {
+                    ...req.body,
 
-                if (authentication_payload_)
-                {
-                    req.body =
-                        {
-                            ...req.body,
-                            agentId: authentication_payload_.agentId,
-                            sessionId: authentication_payload_.sessionId
-                        }
+                    session: jwtDecode.payload,
+                    sessionCreatedAt: "",
+                    validSession: jwtDecode.valid
                 }
             }
         }
@@ -48,6 +46,19 @@ export function authorizationJsonWebTokenMiddleware(jwtManager: JwtManager)
     }
 
     return middleware;
+}
+
+function getAuthorizationToken(req: Request, header: string = "Authorization"): string
+{
+    if (req.headers[header.toLowerCase()])
+    {
+        let header_: string = typeof req.headers[header.toLowerCase()] === "string" ? req.headers[header.toLowerCase()] as string : "";
+
+        let token_ = header_.split(" ")[1];
+
+        return token_ ?? "";
+    } else
+        return "";
 }
 
 async function createSession(agentId: number, sessionManager: SessionManager, jwtManager: JwtManager, response_: Response, additionalResponseBodyContents: object = {})
@@ -61,7 +72,7 @@ async function createSession(agentId: number, sessionManager: SessionManager, jw
         let token = jwtManager.produce({
             agentId: agentId,
             sessionId: session_.payload.id,
-            refresh: true,
+            canRefresh: true,
         }, session_duration_);
 
         response_.status(StatusCodes.OK).send({token, ...additionalResponseBodyContents});
@@ -143,7 +154,7 @@ export class AuthenticationRouter extends RouterClass
         });
     }
 
-    delete()
+    delete() //by username || e-mail
     {
         this.express_router_.delete("/delete", async (req, res) =>
         {
@@ -192,45 +203,37 @@ export class AuthenticationRouter extends RouterClass
     logout()
     {
         this.express_router_.post("/logout", async (req, res) =>
-        {
-            console.log(req.body.agentId, req.body.sessionId);
-
-            if (specifies(req.headers, ["Authorization".toLowerCase()]))
             {
-                let jwt_payload_ = this.jwtManager.obtain((req.headers["Authorization".toLowerCase()] as string).split(" ")[1]);
-
-                if (!jwt_payload_)
-                    res.status(StatusCodes.UNAUTHORIZED).send({status: getReasonPhrase(StatusCodes.UNAUTHORIZED)});
-                else
+                if (req.body.session)
                 {
-                    let session_: Session | null = (await this.sessionManager.deleteSessionById(jwt_payload_.sessionId)).payload;
+                    let session_: Session | null = (await this.sessionManager.deleteSessionById(req.body.session?.sessionId ?? -1)).payload;
 
-                    if (!session_ || (session_.agentId !== jwt_payload_.agentId))
+                    if (!session_ || (session_.agentId !== req.body.session?.agentId))
                         res.status(StatusCodes.OK).send({status: "invalid session"});
                     else
                         res.status(StatusCodes.OK).send();
-                }
-            } else
-                res.status(StatusCodes.BAD_REQUEST).send({status: getReasonPhrase(StatusCodes.BAD_REQUEST)});
-        });
+                } else
+                    res.status(StatusCodes.EXPECTATION_FAILED).send();
+            }
+        );
     }
 
     refresh()
     {
         this.express_router_.post("/refresh", async (req, res) =>
         {
-            if (specifies(req.body, ["agentId", "sessionId"]))
+            if (req.body.validSession)
+                res.status(StatusCodes.OK).send({token: getAuthorizationToken(req)});
+            else
             {
-                await this.sessionManager.deleteSessionById(req.body["sessionId"]);
+                if (req.body.session)
+                {
+                    let agentId = req.body.session["agentId"];
 
-                let agent_ = await this.agentManager.byId(req.body["agentId"]);
-
-                if (!agent_)
-                    res.status(StatusCodes.FORBIDDEN).send({status: getReasonPhrase(StatusCodes.FORBIDDEN)});
-                else
-                    await createSession(agent_.id, this.sessionManager, this.jwtManager, res);
-            } else
-                res.status(StatusCodes.FORBIDDEN).send();
+                } else
+                {
+                }
+            }
         });
     }
 }

@@ -56,18 +56,22 @@ export class SessionManager
 
     async deleteSessionById(id: number): Promise<CRUD_operation_result_type_>
     {
-        try
+        if (id >= 0)
         {
-            return {
-                error: "",
-                payload: await this.prismaClient.session.delete({
-                    where: {id}
-                })
+            try
+            {
+                return {
+                    error: "",
+                    payload: await this.prismaClient.session.delete({
+                        where: {id}
+                    })
+                }
+            } catch (e)
+            {
+                return {error: (e as Error).message};
             }
-        } catch (e)
-        {
-            return {error: (e as Error).message};
-        }
+        } else
+            return {error: "-1"}
     }
 
     valid(session: Session, agent_id?: number)

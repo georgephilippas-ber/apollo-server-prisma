@@ -1,13 +1,27 @@
 import * as jwt from 'jsonwebtoken';
-import {isolate, specifies} from "../../utilities/utilities";
+import {JwtPayload} from 'jsonwebtoken';
 import crypto from "node:crypto";
+import {isolate, specifies} from "../../utilities/utilities";
 
-export type authentication_payload_type_ =
-    {
-        agentId: number;
-        sessionId: number;
-        refresh: boolean;
-    }
+export interface jwtAuthorizationPayload_type extends JwtPayload
+{
+    agentId: number;
+    sessionId: number;
+    canRefresh: boolean;
+}
+
+const _introspection_jwtAuthorizationPayload: jwtAuthorizationPayload_type = {
+    agentId: -1, sessionId: -1, canRefresh: true
+}
+
+type jwtDecode_type = {
+    payload?: jwtAuthorizationPayload_type;
+
+    isAuthorizationPayload: boolean;
+    hasValidSignature: boolean;
+
+    valid: boolean;
+}
 
 export class JwtManager
 {
@@ -18,46 +32,43 @@ export class JwtManager
         this.secretOrPrivateKey = secretOrPrivateKey;
     }
 
-    public produce(authentication_payload_: authentication_payload_type_, expiration_minutes_?: number): string
+    public produce(authorizationPayload: jwtAuthorizationPayload_type, expiration_minutes_?: number): string
     {
-        let options_ = expiration_minutes_ ? {expiresIn: expiration_minutes_ + " minutes"} : undefined;
-
-        return jwt.sign(authentication_payload_, this.secretOrPrivateKey, options_);
+        return jwt.sign(authorizationPayload, this.secretOrPrivateKey, expiration_minutes_ !== undefined ? {expiresIn: [expiration_minutes_, "minutes"].join(" ")} : undefined);
     }
 
-    public obtain(jsonwebtoken_: string, verify: boolean = true): authentication_payload_type_ | null
+    public decode(jsonwebtoken_: string): jwtDecode_type
     {
-        if (!jsonwebtoken_)
-            return null;
-
-        try
-        {
-            let payload_: any = verify ? jwt.verify(jsonwebtoken_, this.secretOrPrivateKey) : jwt.decode(jsonwebtoken_);
-
-            if (!specifies(payload_, ["agentId", "sessionId", "refresh"]))
-                return null;
-            else
-                return isolate(payload_, ["agentId", "sessionId", "refresh"]) as authentication_payload_type_;
-        } catch (e)
-        {
-            return null;
+        let jwtDecode: jwtDecode_type = {
+            isAuthorizationPayload: false, hasValidSignature: false, valid: false
         }
-    }
 
-    isJwtToken(jsonwebtoken_: string, verify: boolean = false): boolean
-    {
-        if (!jsonwebtoken_)
-            return false;
+        let payload_ = jwt.decode(jsonwebtoken_);
 
-        try
+        if (payload_)
         {
-            verify ? jwt.verify(jsonwebtoken_, this.secretOrPrivateKey) : jwt.decode(jsonwebtoken_);
+            if (specifies(payload_, Object.keys(_introspection_jwtAuthorizationPayload)))
+            {
+                jwtDecode.payload = isolate(payload_, Object.keys(_introspection_jwtAuthorizationPayload));
 
-            return true;
-        } catch (e)
-        {
-            return false;
+                jwtDecode.isAuthorizationPayload = true;
+            } else
+                jwtDecode.isAuthorizationPayload = false;
+
+            try
+            {
+                jwt.verify(jsonwebtoken_, this.secretOrPrivateKey);
+
+                jwtDecode.hasValidSignature = true;
+            } catch (e)
+            {
+
+            }
         }
+
+        jwtDecode.valid = jwtDecode.isAuthorizationPayload && jwtDecode.hasValidSignature;
+
+        return jwtDecode;
     }
 
     public getSecretOrPrivateKey()
