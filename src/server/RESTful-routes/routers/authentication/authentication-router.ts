@@ -146,6 +146,9 @@ export class AuthenticationRouter extends RouterClass
 
             if (specifies(req.headers, ["Authorization".toLowerCase()]))
             {
+                let jsonwebtoken_ = req.headers["Authorization".toLowerCase()] as string;
+
+
                 //TODO: obtain, decode, verify, destroy session, respond
                 res.send(req.headers["Authorization".toLowerCase()]);
             } else
