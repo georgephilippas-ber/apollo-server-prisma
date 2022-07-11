@@ -8,7 +8,7 @@ import {
 } from "../../../../database/managers/agent-manager";
 
 import {getReasonPhrase, StatusCodes} from 'http-status-codes';
-import {isolate, specifies} from "../../../../core/utilities/utilities";
+import {isolate, specifies, toInteger} from "../../../../core/utilities/utilities";
 import {SessionManager} from "../../../../database/managers/session-manager";
 import {JwtManager} from "../../../../core/authentication/jwt-manager/jwt-manager";
 import {Session} from "@prisma/client";
@@ -20,7 +20,7 @@ let activeDefault: boolean = true;
 
 let session_duration_: number = 0x02;
 
-export function authorizationMiddleware(sessionManager: SessionManager, jwtManager: JwtManager)
+export function authorizationJsonWebTokenMiddleware(jwtManager: JwtManager)
 {
     async function middleware(req: Request, res: Response, next: NextFunction)
     {
@@ -34,15 +34,12 @@ export function authorizationMiddleware(sessionManager: SessionManager, jwtManag
 
                 if (authentication_payload_)
                 {
-                    if (await sessionManager.isSessionValid(authentication_payload_.sessionId, authentication_payload_.agentId))
-                    {
-                        req.body =
-                            {
-                                ...req.body,
-                                agentId: authentication_payload_.agentId,
-                                sessionId: authentication_payload_.sessionId
-                            }
-                    }
+                    req.body =
+                        {
+                            ...req.body,
+                            agentId: authentication_payload_.agentId,
+                            sessionId: authentication_payload_.sessionId
+                        }
                 }
             }
         }
@@ -51,6 +48,28 @@ export function authorizationMiddleware(sessionManager: SessionManager, jwtManag
     }
 
     return middleware;
+}
+
+
+async function createSession(agentId: number, sessionManager: SessionManager, jwtManager: JwtManager, jwtPayloadContents: object = {}, response_: Response)
+{
+    let session_ = await sessionManager.createSession(agentId, session_duration_);
+
+    if (!session_.payload)
+        response_.status(StatusCodes.INTERNAL_SERVER_ERROR).send({status: session_.error});
+    else
+    {
+        let token = jwtManager.produce({
+            agentId: agentId,
+            sessionId: session_.payload.id,
+            refresh: true,
+            ...jwtPayloadContents
+        }, session_duration_);
+
+        response_.status(StatusCodes.OK).send({token});
+    }
+
+    await sessionManager.deleteExpiredSessions(agentId);
 }
 
 export class AuthenticationRouter extends RouterClass
@@ -70,7 +89,7 @@ export class AuthenticationRouter extends RouterClass
         this.express_router_.use(morgan("short"));
         this.express_router_.use(cors());
         this.express_router_.use(express.json());
-        this.express_router_.use(authorizationMiddleware(sessionManager, jwtManager));
+        this.express_router_.use(authorizationJsonWebTokenMiddleware(sessionManager, jwtManager));
 
         this.use();
     }
@@ -162,24 +181,12 @@ export class AuthenticationRouter extends RouterClass
                 if (!agent_)
                     res.status(StatusCodes.FORBIDDEN).send({status: getReasonPhrase(StatusCodes.FORBIDDEN)});
                 else
-                {
-                    let session_ = await this.sessionManager.createSession(agent_.id, session_duration_);
-
-                    if (!session_.payload)
-                        res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({status: session_.error});
-                    else
-                    {
-                        let token = this.jwtManager.produce({
-                            agentId: agent_.id,
-                            sessionId: session_.payload.id,
-                            refresh: true
-                        }, session_duration_);
-
-                        res.status(StatusCodes.OK).send({token});
-                    }
-
-                    await this.sessionManager.deleteExpiredSessions(agent_.id);
-                }
+                    await createSession(agent_.id, this.sessionManager, this.jwtManager, {
+                        username: agent_.username,
+                        email: agent_.email,
+                        forename: agent_.forename,
+                        surname: agent_.surname
+                    }, res);
             }
         });
     }
@@ -212,11 +219,12 @@ export class AuthenticationRouter extends RouterClass
 
     refresh()
     {
-        this.express_router_.post("/refresh", (req, res, next) =>
+        this.express_router_.post("/refresh", async (req, res, next) =>
         {
-            if (req.body["agentId"] && req.body["sessionId"])
+            if (specifies(req.body, ["agentId", "sessionId"]))
             {
-                res.send("All good here");
+                await this.sessionManager.deleteSessionById(req.body["sessionId"]);
+
             } else
                 res.status(StatusCodes.FORBIDDEN).send();
         });

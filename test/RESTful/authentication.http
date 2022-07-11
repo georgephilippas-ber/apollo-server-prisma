@@ -1,4 +1,4 @@
-### Send POST request with json body
+### register
 POST http://localhost:4000/authentication/register
 Content-Type: application/json
 
@@ -11,7 +11,7 @@ Content-Type: application/json
   "passkey": ""
 }
 
-### Send POST request with json body
+### delete
 DELETE http://localhost:4000/authentication/delete
 Content-Type: application/json
 
@@ -19,19 +19,31 @@ Content-Type: application/json
   "identifier": "georg"
 }
 
-### Send POST request with json body
+### login
 POST http://localhost:4000/authentication/login
 Content-Type: application/json
 
 {
-  "credentials": ["georg", "georg"]
+  "credentials": [
+    "georg",
+    "georg"
+  ]
 }
 
-###
-POST http://localhost:4000/authentication/logout
+### refresh
+POST http://localhost:4000/authentication/refresh
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZ2VudElkIjoxLCJzZXNzaW9uSWQiOjE2LCJyZWZyZXNoIjp0cnVlLCJpYXQiOjE2NTc1Mzg0MTcsImV4cCI6MTY1NzUzODUzN30.32cmQ9dsEmq4yNB25BXX_7sIGraHC5MfvbW2riMUb08
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZ2VudElkIjoxLCJzZXNzaW9uSWQiOjE3LCJyZWZyZXNoIjp0cnVlLCJpYXQiOjE2NTc1NDA0MTEsImV4cCI6MTY1NzU0MDUzMX0.0NUHMbcVmRvubuGkpkU_H6c9zBpdGHdK03ZQ7fytyGU
 
 {
-
 }
+
+### logout
+POST http://localhost:4000/authentication/logout
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZ2VudElkIjoxLCJzZXNzaW9uSWQiOjE3LCJyZWZyZXNoIjp0cnVlLCJpYXQiOjE2NTc1NDA0MTEsImV4cCI6MTY1NzU0MDUzMX0.0NUHMbcVmRvubuGkpkU_H6c9zBpdGHdK03ZQ7fytyGU
+
+{
+}
+
+
