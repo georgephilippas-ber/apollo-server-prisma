@@ -1,25 +1,25 @@
-import {Server} from "./src/server/apollo-server";
-
 import {prismaClient} from "./src/database/database-provider"
-import {AgentManager} from "./src/database/managers/agent-manager";
-import {seedDatabase} from "./seed/seed";
+
 import {ResolversCollection} from "./src/server/GraphQL-resolvers/resolvers-interface";
 import {AgentResolvers} from "./src/server/GraphQL-resolvers/agent-resolvers/agent-resolvers";
-import {AuthorizationRouter} from "./src/server/RESTful-routes/routers/authorization/authorization-router";
-import {Routers} from "./src/server/RESTful-routes/router-interface";
-import {JwtManager} from "./src/core/authorization/jwt-manager/jwt-manager";
-import {SessionManager} from "./src/database/managers/session-manager";
 
+import {Routers} from "./src/server/RESTful-routes/router-interface";
+import {AuthorizationRouter} from "./src/server/RESTful-routes/routers/authorization/authorization-router";
+
+import {AgentManager} from "./src/database/managers/agent-manager";
+import {SessionManager} from "./src/database/managers/session-manager";
+import {JwtManager} from "./src/core/authorization/jwt-manager/jwt-manager";
+
+import {seedDatabase} from "./seed/seed";
+
+import {Server} from "./src/server/apollo-server";
 
 function server()
 {
-
     let jwtManager = new JwtManager();
 
     let agentManager = new AgentManager(prismaClient, jwtManager);
     let sessionManager = new SessionManager(prismaClient, agentManager);
-
-    console.log(jwtManager.getSecretOrPrivateKey());
 
     let resolversCollection = new ResolversCollection([new AgentResolvers(agentManager)]);
 
