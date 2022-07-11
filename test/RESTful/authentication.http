@@ -33,7 +33,7 @@ Content-Type: application/json
 ### refresh
 POST http://localhost:4000/authentication/refresh
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZ2VudElkIjoxLCJzZXNzaW9uSWQiOjQ1LCJjYW5SZWZyZXNoIjp0cnVlLCJpYXQiOjE2NTc1NTQ2MzMsImV4cCI6MTY1NzU1NTUzM30.DiKutpFkIvUJks3Le5npVJjf1AgeEJn2yLGDD0VYy1A
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZ2VudElkIjoxLCJzZXNzaW9uSWQiOjUwLCJjYW5SZWZyZXNoIjp0cnVlLCJpYXQiOjE2NTc1NTgwOTgsImV4cCI6MTY1NzU1ODk5OH0.BBnP32kb3JQzYtK1z7XXjkfDrc0Zbn4zmk66gY2TUN0
 
 {
 }
@@ -41,7 +41,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZ2VudElkIjoxLCJzZ
 ### logout
 POST http://localhost:4000/authentication/logout
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZ2VudElkIjoxLCJzZXNzaW9uSWQiOjQ0LCJjYW5SZWZyZXNoIjp0cnVlLCJpYXQiOjE2NTc1NTQwNTUsImV4cCI6MTY1NzU1NDk1NX0.hnnH_NVgWroz_2Y3g-hH8xR8bBYWLdyEdXp_OhYQAng
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZ2VudElkIjoxLCJzZXNzaW9uSWQiOjQ4LCJjYW5SZWZyZXNoIjp0cnVlLCJpYXQiOjE2NTc1NTU3MTMsImV4cCI6MTY1NzU1NjYxM30.RrtuF3qLr1H_WOZnRPHoQxCa1_ENco2Fkv0nOeXINZY
 
 {
 }

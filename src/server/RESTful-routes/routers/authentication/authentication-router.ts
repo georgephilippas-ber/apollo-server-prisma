@@ -36,8 +36,7 @@ export function authorizationJsonWebTokenMiddleware(jwtManager: JwtManager)
                     ...req.body,
 
                     session: jwtDecode.payload,
-                    sessionCreatedAt: "",
-                    validSession: jwtDecode.valid
+                    validSessionJSONWebToken: jwtDecode.valid
                 }
             }
         }
@@ -222,18 +221,21 @@ export class AuthenticationRouter extends RouterClass
     {
         this.express_router_.post("/refresh", async (req, res) =>
         {
-            if (req.body.validSession)
-                res.status(StatusCodes.OK).send({token: getAuthorizationToken(req)});
-            else
+            if (req.body.session && req.body.validSessionJSONWebToken)
             {
-                if (req.body.session)
-                {
-                    let agentId = req.body.session["agentId"];
+                let sessionId = req.body.session["sessionId"], agentId = req.body.session["agentId"];
 
+                if (await this.sessionManager.isSessionValid(sessionId, agentId))
+                {
+                    await this.sessionManager.deleteSessionById(sessionId);
+
+                    await createSession(agentId, this.sessionManager, this.jwtManager, res);
                 } else
                 {
+                    res.status(StatusCodes.FORBIDDEN).send({status: "invalid session"});
                 }
-            }
+            } else
+                res.status(StatusCodes.FORBIDDEN).send({status: "JSON Web Token expired"});
         });
     }
 }
