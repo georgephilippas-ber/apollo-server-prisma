@@ -1,4 +1,4 @@
-import {jwtAuthorizationPayload_type, JwtManager} from "../../src/core/authentication/jwt-manager/jwt-manager";
+import {jwtAuthorizationPayload_type, JwtManager} from "../../src/core/authorization/jwt-manager/jwt-manager";
 import {faker} from "@faker-js/faker";
 import {isolate} from "../../src/core/utilities/utilities";
 

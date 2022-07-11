@@ -6,11 +6,11 @@ import {seedDatabase} from "./seed/seed";
 import {ResolversCollection} from "./src/server/GraphQL-resolvers/resolvers-interface";
 import {AgentResolvers} from "./src/server/GraphQL-resolvers/agent-resolvers/agent-resolvers";
 import {
-    AuthenticationRouter,
+    AuthorizationRouter,
     authorizationJsonWebTokenMiddleware
-} from "./src/server/RESTful-routes/routers/authentication/authentication-router";
+} from "./src/server/RESTful-routes/routers/authorization/authorization-router";
 import {Routers} from "./src/server/RESTful-routes/router-interface";
-import {JwtManager} from "./src/core/authentication/jwt-manager/jwt-manager";
+import {JwtManager} from "./src/core/authorization/jwt-manager/jwt-manager";
 import {SessionManager} from "./src/database/managers/session-manager";
 
 
@@ -28,7 +28,7 @@ function server()
 
     seedDatabase(agentManager, true).then(async value =>
     {
-        let server_ = new Server(resolversCollection, new Routers([new AuthenticationRouter(agentManager, sessionManager, jwtManager)]));
+        let server_ = new Server(resolversCollection, new Routers([new AuthorizationRouter(agentManager, sessionManager, jwtManager)]));
 
         await server_.start();
 

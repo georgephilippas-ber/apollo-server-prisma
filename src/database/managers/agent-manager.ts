@@ -1,10 +1,10 @@
 import {Agent, PrismaClient} from "@prisma/client";
-import {Encryption} from "../../core/authentication/encryption/encryption";
+import {Encryption} from "../../core/authorization/encryption/encryption";
 
 import {faker} from "@faker-js/faker";
 import {isString_email} from "../../core/utilities/utilities";
 import {CRUD_operation_result_type_} from "../database-provider";
-import {JwtManager} from "../../core/authentication/jwt-manager/jwt-manager";
+import {JwtManager} from "../../core/authorization/jwt-manager/jwt-manager";
 
 export type candidate_agent_type_ =
     {

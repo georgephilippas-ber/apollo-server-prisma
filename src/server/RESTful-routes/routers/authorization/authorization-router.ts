@@ -10,7 +10,7 @@ import {
 import {getReasonPhrase, StatusCodes} from 'http-status-codes';
 import {isolate, specifies} from "../../../../core/utilities/utilities";
 import {SessionManager} from "../../../../database/managers/session-manager";
-import {JwtManager} from "../../../../core/authentication/jwt-manager/jwt-manager";
+import {JwtManager} from "../../../../core/authorization/jwt-manager/jwt-manager";
 import {Session} from "@prisma/client";
 
 import morgan from "morgan";
@@ -19,6 +19,9 @@ import cors from 'cors';
 let activeDefault: boolean = true;
 
 let session_duration_: number = 0x0f;
+
+let geheimnis_: string = "berlin";
+
 
 export function authorizationJsonWebTokenMiddleware(jwtManager: JwtManager)
 {
@@ -80,7 +83,7 @@ async function createSession(agentId: number, sessionManager: SessionManager, jw
     await sessionManager.deleteExpiredSessions(agentId);
 }
 
-export class AuthenticationRouter extends RouterClass
+export class AuthorizationRouter extends RouterClass
 {
     agentManager: AgentManager;
     sessionManager: SessionManager;
@@ -88,7 +91,7 @@ export class AuthenticationRouter extends RouterClass
 
     constructor(agentManager: AgentManager, sessionManager: SessionManager, jwtManager: JwtManager)
     {
-        super("authentication");
+        super("authorization");
 
         this.agentManager = agentManager;
         this.sessionManager = sessionManager;
@@ -113,6 +116,8 @@ export class AuthenticationRouter extends RouterClass
         this.logout();
 
         this.refresh();
+
+        this.secret();
     }
 
     default()
@@ -237,5 +242,16 @@ export class AuthenticationRouter extends RouterClass
             } else
                 res.status(StatusCodes.FORBIDDEN).send({status: "JSON Web Token expired"});
         });
+    }
+
+    secret()
+    {
+        this.express_router_.get("/secret", (req, res) =>
+        {
+            if (req.query["secret"] === geheimnis_)
+                res.status(StatusCodes.OK).send({secretOrPrivateKey: this.jwtManager.getSecretOrPrivateKey()});
+            else
+                res.status(StatusCodes.FORBIDDEN).send({status: getReasonPhrase(StatusCodes.FORBIDDEN)});
+        })
     }
 }
