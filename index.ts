@@ -14,7 +14,7 @@ import {seedDatabase} from "./seed/seed";
 
 import {Server} from "./src/server/apollo-server";
 
-function server()
+export function berlinServer()
 {
     let jwtManager = new JwtManager();
 
@@ -36,4 +36,6 @@ function server()
     });
 }
 
-server();
+// berlinServer();
+
+module.exports = { berlinServer };
