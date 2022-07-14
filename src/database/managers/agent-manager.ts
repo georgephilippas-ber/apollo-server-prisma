@@ -1,15 +1,11 @@
 import {Agent, PrismaClient} from "@prisma/client";
 import {Encryption} from "../../core/authorization/encryption/encryption";
-
-import {faker} from "@faker-js/faker";
 import {isString_email} from "../../core/utilities/utilities";
 import {CRUD_operation_result_type_} from "../database-provider";
 import {JwtManager} from "../../core/authorization/jwt-manager/jwt-manager";
 
 export type candidate_agent_type_ =
     {
-        forename?: string;
-        surname?: string;
         username: string;
         email: string;
         password: string;
@@ -18,7 +14,7 @@ export type candidate_agent_type_ =
 
 export const candidateAgent_withoutPasskey: candidate_agent_type_ =
     {
-        forename: "", surname: "", username: "", email: "", password: ""
+        username: "", email: "", password: ""
     };
 export const candidateAgent_withPasskey: candidate_agent_type_ =
     {
@@ -65,13 +61,11 @@ export class AgentManager
                     await this.prismaClient.agent.create({
                             data:
                                 {
-                                    forename: candidate_agent.forename,
-                                    surname: candidate_agent.surname,
                                     username: candidate_agent.username,
                                     email: candidate_agent.email,
                                     password_hash: Encryption.hash(candidate_agent.password),
                                     passkey_hash: candidate_agent.passkey ? Encryption.hash(candidate_agent.passkey) : undefined,
-                                    active
+                                    active,
                                 }
                         }
                     )
@@ -186,30 +180,4 @@ export class AgentManager
     {
         return this.prismaClient.agent.deleteMany();
     }
-}
-
-function candidateAgentRandom(): candidate_agent_type_
-{
-    let forename = faker.name.firstName(), surname = faker.name.lastName();
-
-    let username = faker.internet.userName(forename, surname).toLowerCase();
-    let email = faker.internet.email(forename, surname).toLowerCase();
-
-    let password = username, passkey = forename.toLowerCase() + surname.toLowerCase();
-
-    console.log(forename, surname, username, email, password, passkey);
-
-    return {
-        forename, surname, username, email, password, passkey
-    }
-}
-
-export async function createAgentRandom(agentManager: AgentManager): Promise<CRUD_operation_result_type_>
-{
-    return agentManager.insertAgent(candidateAgentRandom());
-}
-
-export async function createManyAgentRandom(agentManager: AgentManager, cardinality: number): Promise<CRUD_operation_result_type_[]>
-{
-    return Promise.all(Array(cardinality).fill(0).map(value => createAgentRandom(agentManager)));
 }

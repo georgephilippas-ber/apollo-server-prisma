@@ -18,7 +18,7 @@ export function berlinServer()
 
     let resolversCollection = new ResolversCollection([new AgentResolvers(agentManager)]);
 
-    seedDatabase(agentManager, true).then(async value =>
+    seedDatabase(agentManager, 0x0f).then(async value =>
     {
         let server_ = new Server(resolversCollection, new Routers([new AuthorizationRouter(agentManager, sessionManager, jwtManager)]));
 

@@ -197,8 +197,6 @@ export class AuthorizationRouter extends RouterClass
                     await createSession(agent_.id, this.sessionManager, this.jwtManager, res, {
                         username: agent_.username,
                         email: agent_.email,
-                        forename: agent_.forename,
-                        surname: agent_.surname
                     });
             }
         });

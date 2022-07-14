@@ -21,6 +21,8 @@ export class Server
     {
         this.express_application = express();
 
+        this.express_application.use(express.static("depot"));
+
         this.http_server = http.createServer(this.express_application);
 
         this.port = port;

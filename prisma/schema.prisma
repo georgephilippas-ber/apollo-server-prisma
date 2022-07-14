@@ -13,9 +13,6 @@ datasource db {
 model Agent {
   id Int @id @default(autoincrement())
 
-  forename String?
-  surname  String?
-
   username String @unique
   email    String @unique
 
@@ -25,6 +22,7 @@ model Agent {
   active Boolean
 
   sessions Session[]
+  Profile  Profile[]
 }
 
 model Session {
@@ -33,6 +31,32 @@ model Session {
   createdAt DateTime @default(now())
   expiresAt DateTime
 
-  Agent   Agent @relation(fields: [agentId], references: [id])
+  Agent   Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
   agentId Int
+}
+
+//
+
+model Profile {
+  id Int @id @default(autoincrement())
+
+  createdAt DateTime @default(now())
+
+  forename String?
+  surname  String?
+
+  birthdate DateTime
+
+  avatar   Avatar? @relation(fields: [avatarId], references: [id])
+  avatarId Int?
+
+  agent   Agent? @relation(fields: [agentId], references: [id])
+  agentId Int?
+}
+
+model Avatar {
+  id Int @id @default(autoincrement())
+
+  url     String
+  Profile Profile[]
 }
