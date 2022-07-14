@@ -47,6 +47,8 @@ model Profile {
 
   birthdate DateTime
 
+  location String?
+
   avatar   Avatar? @relation(fields: [avatarId], references: [id])
   avatarId Int?
 

@@ -1,7 +1,7 @@
 import {Agent, PrismaClient} from "@prisma/client";
 import {Encryption} from "../../core/authorization/encryption/encryption";
 import {isString_email} from "../../core/utilities/utilities";
-import {CRUD_operation_result_type_} from "../database-provider";
+import {dbOperation_type_} from "../database-provider";
 import {JwtManager} from "../../core/authorization/jwt-manager/jwt-manager";
 
 export type candidate_agent_type_ =
@@ -39,7 +39,7 @@ export class AgentManager
         return this.prismaClient.agent.findMany({take: cardinality});
     }
 
-    async insertAgent(candidate_agent: candidate_agent_type_, active: boolean = true): Promise<CRUD_operation_result_type_>
+    async insertAgent(candidate_agent: candidate_agent_type_, active: boolean = true): Promise<dbOperation_type_>
     {
         let error_: string[] = [];
 
@@ -100,7 +100,7 @@ export class AgentManager
         return this.prismaClient.agent.findUnique({where: {passkey_hash}})
     }
 
-    async deleteBy(identifier: string): Promise<CRUD_operation_result_type_>
+    async deleteBy(identifier: string): Promise<dbOperation_type_>
     {
         let where_: any = isString_email(identifier) ? {username: identifier} : {email: identifier};
 

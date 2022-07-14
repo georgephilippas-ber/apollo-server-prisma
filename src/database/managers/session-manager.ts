@@ -1,6 +1,6 @@
 import {PrismaClient, Session} from "@prisma/client";
 import {AgentManager} from "./agent-manager";
-import {CRUD_operation_result_type_} from "../database-provider";
+import {dbOperation_type_} from "../database-provider";
 import moment from "moment";
 
 export class SessionManager
@@ -21,7 +21,7 @@ export class SessionManager
         return this.prismaClient.session.findMany();
     }
 
-    async createSession(agent_id_: number, expiresIn: number): Promise<CRUD_operation_result_type_>
+    async createSession(agent_id_: number, expiresIn: number): Promise<dbOperation_type_>
     {
         if (!(await this.agentManager.byId(agent_id_)))
             return {
@@ -54,7 +54,7 @@ export class SessionManager
         }
     }
 
-    async deleteSessionById(id: number): Promise<CRUD_operation_result_type_>
+    async deleteSessionById(id: number): Promise<dbOperation_type_>
     {
         if (id >= 0)
         {
