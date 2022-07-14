@@ -1,4 +1,4 @@
-import {combine, isString_email, toInteger, toProperCase} from "../../src/core/utilities/utilities";
+import {combine, isString_email, toInteger, toProperCase} from "../../core/utilities/utilities";
 
 describe("utilities", () =>
 {

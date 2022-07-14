@@ -1,7 +1,7 @@
-import {AgentManager, createManyAgentRandom} from "../../../src/database/managers/agent-manager";
-import {prismaClient} from "../../../src/database/database-provider";
+import {AgentManager, createManyAgentRandom} from "../../../database/managers/agent-manager";
+import {prismaClient} from "../../../database/database-provider";
 
-import {JwtManager} from "../../../src/core/authorization/jwt-manager/jwt-manager";
+import {JwtManager} from "../../../core/authorization/jwt-manager/jwt-manager";
 
 let agentManager = new AgentManager(prismaClient, new JwtManager());
 

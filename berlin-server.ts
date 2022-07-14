@@ -4,7 +4,7 @@ import {prismaClient} from "./database/database-provider";
 import {SessionManager} from "./database/managers/session-manager";
 import {ResolversCollection} from "./server/GraphQL-resolvers/resolvers-interface";
 import {AgentResolvers} from "./server/GraphQL-resolvers/agent-resolvers/agent-resolvers";
-import {seedDatabase} from "../seed/seed";
+import {seedDatabase} from "./seed/seed";
 import {Server} from "./server/apollo-server";
 import {Routers} from "./server/RESTful-routes/router-interface";
 import {AuthorizationRouter} from "./server/RESTful-routes/routers/authorization/authorization-router";

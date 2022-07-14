@@ -1,3 +1,3 @@
-import {berlinServer} from "./src/berlin-server";
+import {berlinServer} from "./berlin-server";
 
 berlinServer();

@@ -1,6 +1,6 @@
-import {AgentManager, candidate_agent_type_} from "../src/database/managers/agent-manager";
+import {AgentManager, candidate_agent_type_} from "../database/managers/agent-manager";
 import {faker} from "@faker-js/faker";
-import {dbOperation_type_} from "../src/database/database-provider";
+import {dbOperation_type_} from "../database/database-provider";
 
 
 
