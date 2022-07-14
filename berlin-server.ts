@@ -9,8 +9,7 @@ import {Server} from "./server/apollo-server";
 import {Routers} from "./server/RESTful-routes/router-interface";
 import {AuthorizationRouter} from "./server/RESTful-routes/routers/authorization/authorization-router";
 
-export function berlinServer(port: number = 4_000, cardinality: number = 0x02)
-{
+export async function berlinServer(port: number = 4_000, cardinality: number = 0x02): Promise<Server> {
     let jwtManager = new JwtManager();
 
     let agentManager = new AgentManager(prismaClient, jwtManager);
@@ -18,15 +17,13 @@ export function berlinServer(port: number = 4_000, cardinality: number = 0x02)
 
     let resolversCollection = new ResolversCollection([new AgentResolvers(agentManager)]);
 
-    seedDatabase(agentManager, cardinality).then(async value =>
-    {
-        let server_ = new Server(resolversCollection, new Routers([new AuthorizationRouter(agentManager, sessionManager, jwtManager)]), port);
+    await seedDatabase(agentManager, cardinality);
 
-        await server_.start();
+    let server_ = new Server(resolversCollection, new Routers([new AuthorizationRouter(agentManager, sessionManager, jwtManager)]), port);
 
-        process.on("SIGINT", async args =>
-        {
-            await server_.stop();
-        });
+    process.on("SIGINT", async args => {
+        await server_.stop();
     });
+
+    return server_.start();
 }

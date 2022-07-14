@@ -8,8 +8,7 @@ import {ResolversCollection} from "./GraphQL-resolvers/resolvers-interface";
 import {Routers} from "./RESTful-routes/router-interface";
 import {urlJoin} from "url-join-ts";
 
-export class Server
-{
+export class Server {
     express_application: Express;
     http_server: http.Server;
 
@@ -17,8 +16,7 @@ export class Server
 
     port: number;
 
-    constructor(resolvers_collection_: ResolversCollection, routers_: Routers, port: number = 4_000)
-    {
+    constructor(resolvers_collection_: ResolversCollection, routers_: Routers, port: number = 4_000) {
         this.express_application = express();
 
         this.express_application.use(express.static("depot"));
@@ -35,32 +33,32 @@ export class Server
             plugins: [ApolloServerPluginDrainHttpServer({httpServer: this.http_server})]
         });
 
-        routers_.getRouters().forEach(value =>
-        {
+        routers_.getRouters().forEach(value => {
             this.express_application.use("/" + value.getEndpoint(), value.getRouter());
 
             console.log(urlJoin("http://localhost:" + this.port, value.getEndpoint()));
         });
     }
 
-    async start(): Promise<Server>
-    {
+    async start(): Promise<Server> {
         await this.apollo_server.start();
 
         this.apollo_server.applyMiddleware({
             app: this.express_application
         });
 
-        this.http_server.listen({port: this.port}, () =>
-        {
+        this.http_server.listen({port: this.port}, () => {
             console.log("http://localhost:" + this.port + this.apollo_server.graphqlPath)
         });
 
         return this;
     }
 
-    async stop()
-    {
+    getExpress(): Express {
+        return this.express_application;
+    }
+
+    async stop() {
         console.log();
         console.log("!Apollo");
 
