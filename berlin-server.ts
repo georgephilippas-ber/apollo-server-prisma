@@ -9,7 +9,7 @@ import {Server} from "./server/apollo-server";
 import {Routers} from "./server/RESTful-routes/router-interface";
 import {AuthorizationRouter} from "./server/RESTful-routes/routers/authorization/authorization-router";
 
-export function berlinServer()
+export function berlinServer(port: number = 4_000, cardinality: number = 0x02)
 {
     let jwtManager = new JwtManager();
 
@@ -18,9 +18,9 @@ export function berlinServer()
 
     let resolversCollection = new ResolversCollection([new AgentResolvers(agentManager)]);
 
-    seedDatabase(agentManager, 0x0f).then(async value =>
+    seedDatabase(agentManager, cardinality).then(async value =>
     {
-        let server_ = new Server(resolversCollection, new Routers([new AuthorizationRouter(agentManager, sessionManager, jwtManager)]));
+        let server_ = new Server(resolversCollection, new Routers([new AuthorizationRouter(agentManager, sessionManager, jwtManager)]), port);
 
         await server_.start();
 
