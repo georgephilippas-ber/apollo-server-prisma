@@ -6,8 +6,8 @@ import {ResolversCollection} from "./server/GraphQL-resolvers/resolvers-interfac
 import {AgentResolvers} from "./server/GraphQL-resolvers/agent-resolvers/agent-resolvers";
 import {seedDatabase} from "./seed/seed";
 import {Server} from "./server/apollo-server";
-import {Routers} from "./server/RESTful-routes/router-interface";
-import {AuthorizationRouter} from "./server/RESTful-routes/routers/authorization/authorization-router";
+import {Routers} from "./server/REST-routers/router-interface";
+import {AuthorizationRouter} from "./server/REST-routers/routers/authorization/authorization-router";
 
 export async function berlinServer(port: number = 4_000, cardinality: number = 0x02): Promise<Server> {
     let jwtManager = new JwtManager();

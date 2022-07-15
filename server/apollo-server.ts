@@ -5,7 +5,7 @@ import {buildSchema} from "graphql";
 import {readFileSync} from "fs";
 import {ApolloServerPluginDrainHttpServer} from "apollo-server-core";
 import {ResolversCollection} from "./GraphQL-resolvers/resolvers-interface";
-import {Routers} from "./RESTful-routes/router-interface";
+import {Routers} from "./REST-routers/router-interface";
 import {urlJoin} from "url-join-ts";
 
 export class Server {

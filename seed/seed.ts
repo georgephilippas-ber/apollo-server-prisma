@@ -2,9 +2,6 @@ import {AgentManager, candidate_agent_type_} from "../database/managers/agent-ma
 import {faker} from "@faker-js/faker";
 import {dbOperation_type_} from "../database/database-provider";
 
-
-
-
 export async function createAgentRandom(agentManager: AgentManager): Promise<dbOperation_type_>
 {
     function candidateAgentRandom(forename: string = faker.name.firstName(), surname: string = faker.name.lastName()): candidate_agent_type_
@@ -29,12 +26,9 @@ export async function createManyAgentRandom(agentManager: AgentManager, cardinal
     return Promise.all(Array(cardinality).fill(0).map(value => createAgentRandom(agentManager)));
 }
 
-export async function seedDatabase(agentManager: AgentManager, cardinality: number = 0x04, bypass_: boolean = false)
+export async function seedDatabase(agentManager: AgentManager, cardinality: number = 0x04)
 {
-    if (!bypass_)
-    {
-        await agentManager.delete_all();
+    await agentManager.delete_all();
 
-        (await createManyAgentRandom(agentManager, cardinality)).filter(value => value.error).forEach(value => console.log(value.error));
-    }
+    (await createManyAgentRandom(agentManager, cardinality)).filter(value => value.error).forEach(value => console.log(value.error));
 }
