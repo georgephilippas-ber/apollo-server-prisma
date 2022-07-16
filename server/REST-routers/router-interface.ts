@@ -11,7 +11,6 @@ export class RouterClass
         this.express_router_ = express.Router();
 
         this.endpoint_ = endpoint_;
-
     }
 
     getRouter(): Router
@@ -37,5 +36,12 @@ export class Routers
     getRouters(): RouterClass[]
     {
         return this.routers_;
+    }
+
+    add(router_: RouterClass)
+    {
+        this.routers_.push(router_);
+
+        return this;
     }
 }

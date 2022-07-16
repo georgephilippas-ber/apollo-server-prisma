@@ -5,10 +5,11 @@ import {buildSchema} from "graphql";
 import {readFileSync} from "fs";
 import {ApolloServerPluginDrainHttpServer} from "apollo-server-core";
 import {ResolversCollection} from "./GraphQL-resolvers/resolvers-interface";
-import {Routers} from "./REST-routers/router-interface";
+import {RouterClass, Routers} from "./REST-routers/router-interface";
 import {urlJoin} from "url-join-ts";
 
-export class Server {
+export class Server
+{
     express_application: Express;
     http_server: http.Server;
 
@@ -16,7 +17,10 @@ export class Server {
 
     port: number;
 
-    constructor(resolvers_collection_: ResolversCollection, routers_: Routers, port: number = 4_000) {
+    routers_: Routers;
+
+    constructor(resolvers_collection_: ResolversCollection, routers_: Routers, port: number = 4_000)
+    {
         this.express_application = express();
 
         this.express_application.use(express.static("depot"));
@@ -33,32 +37,44 @@ export class Server {
             plugins: [ApolloServerPluginDrainHttpServer({httpServer: this.http_server})]
         });
 
-        routers_.getRouters().forEach(value => {
+        this.routers_ = routers_;
+    }
+
+    public addRouter(router_: RouterClass)
+    {
+        this.routers_.add(router_);
+    }
+
+    async start(): Promise<Server>
+    {
+        this.routers_.getRouters().forEach(value =>
+        {
             this.express_application.use("/" + value.getEndpoint(), value.getRouter());
 
             console.log(urlJoin("http://localhost:" + this.port, value.getEndpoint()));
         });
-    }
 
-    async start(): Promise<Server> {
         await this.apollo_server.start();
 
         this.apollo_server.applyMiddleware({
             app: this.express_application
         });
 
-        this.http_server.listen({port: this.port}, () => {
+        this.http_server.listen({port: this.port}, () =>
+        {
             console.log("http://localhost:" + this.port + this.apollo_server.graphqlPath)
         });
 
         return this;
     }
 
-    getExpress(): Express {
+    getExpress(): Express
+    {
         return this.express_application;
     }
 
-    async stop() {
+    async stop()
+    {
         console.log();
         console.log("!Apollo");
 

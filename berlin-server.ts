@@ -9,21 +9,54 @@ import {Server} from "./server/apollo-server";
 import {Routers} from "./server/REST-routers/router-interface";
 import {AuthorizationRouter} from "./server/REST-routers/routers/authorization/authorization-router";
 
-export async function berlinServer(port: number = 4_000, cardinality: number = 0x02): Promise<Server> {
-    let jwtManager = new JwtManager();
 
-    let agentManager = new AgentManager(prismaClient, jwtManager);
-    let sessionManager = new SessionManager(prismaClient, agentManager);
+class BerlinServer
+{
+    jwtManager: JwtManager;
 
-    let resolversCollection = new ResolversCollection([new AgentResolvers(agentManager)]);
+    //
+    agentManager: AgentManager;
+    sessionManager: SessionManager;
 
-    await seedDatabase(agentManager, cardinality);
+    //
+    agentResolvers: AgentResolvers;
+    resolversCollection: ResolversCollection;
 
-    let server_ = new Server(resolversCollection, new Routers([new AuthorizationRouter(agentManager, sessionManager, jwtManager)]), port);
+    //
+    authorizationRouter: AuthorizationRouter;
+    routers: Routers;
 
-    process.on("SIGINT", async args => {
-        await server_.stop();
-    });
+    server: Server
 
-    return server_.start();
+    constructor(port: number = 4_000)
+    {
+        this.jwtManager = new JwtManager();
+
+        this.agentManager = new AgentManager(prismaClient, this.jwtManager);
+        this.sessionManager = new SessionManager(prismaClient, this.agentManager);
+
+        this.agentResolvers = new AgentResolvers(this.agentManager);
+        this.resolversCollection = new ResolversCollection([this.agentResolvers,]);
+
+        this.authorizationRouter = new AuthorizationRouter(this.agentManager, this.sessionManager, this.jwtManager);
+        this.routers = new Routers([this.authorizationRouter]);
+
+        this.server = new Server(this.resolversCollection, this.routers, port);
+    }
+
+    async start(onSIGINT: boolean = true)
+    {
+        await seedDatabase(this.agentManager, 0x02);
+
+        if (onSIGINT)
+            process.on("SIGINT", async args =>
+            {
+                await this.server.stop();
+            });
+    }
+
+    async stop()
+    {
+        await this.server.stop();
+    }
 }
