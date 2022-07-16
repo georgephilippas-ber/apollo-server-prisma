@@ -9,8 +9,7 @@ import {Server} from "./server/apollo-server";
 import {Routers} from "./server/REST-routers/router-interface";
 import {AuthorizationRouter} from "./server/REST-routers/routers/authorization/authorization-router";
 
-
-class BerlinServer
+export class BerlinServer
 {
     jwtManager: JwtManager;
 
