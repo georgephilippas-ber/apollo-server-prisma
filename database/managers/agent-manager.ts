@@ -39,7 +39,7 @@ export class AgentManager
         return this.prismaClient.agent.findMany({take: cardinality});
     }
 
-    async insertAgent(candidate_agent: candidate_agent_type_, active: boolean = true): Promise<dbOperation_type_>
+    async insertAgent(candidate_agent: candidate_agent_type_, active: boolean = true): Promise<dbOperation_type_<Agent>>
     {
         let error_: string[] = [];
 
@@ -100,7 +100,7 @@ export class AgentManager
         return this.prismaClient.agent.findUnique({where: {passkey_hash}})
     }
 
-    async deleteBy(identifier: string): Promise<dbOperation_type_>
+    async deleteBy(identifier: string): Promise<dbOperation_type_<Agent>>
     {
         let where_: any = isString_email(identifier) ? {username: identifier} : {email: identifier};
 

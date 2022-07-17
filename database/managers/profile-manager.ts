@@ -1,5 +1,6 @@
 import {PrismaClient, Profile} from "@prisma/client";
 import {AgentManager} from "./agent-manager";
+import {dbOperation_type_} from "../database-provider";
 
 export type candidate_profile_type_ =
     {
@@ -23,30 +24,55 @@ export class ProfileManager
         this.agentManager = agentManager;
     }
 
-    create(profile: candidate_profile_type_, agent_id: number)
+    async insertProfile(profile: candidate_profile_type_, agent_id: number): Promise<dbOperation_type_<Profile>>
     {
-        this.prismaClient.profile.create({
-            data:
+        try
+        {
+            return {
+                error: "",
+                payload:
+                    await this.prismaClient.profile.create({
+                        data:
+                            {
+                                forename: profile.forename,
+                                surname: profile.surname,
+                                birthdate: profile.birthdate,
+                                location: profile.location,
+                                avatar: profile.avatar_url ?
+                                    {
+                                        create:
+                                            {
+                                                url: profile.avatar_url
+                                            }
+                                    } : undefined,
+                                agent:
+                                    {
+                                        connect:
+                                            {
+                                                id: agent_id
+                                            }
+                                    }
+                            }
+                    })
+            }
+        } catch (e)
+        {
+            console.log((e as Error).message)
+
+            return {error: (e as Error).message};
+        }
+    }
+
+    async byAgentId(agent_id: number): Promise<Profile | null>
+    {
+        return this.prismaClient.profile.findFirst({
+            where:
                 {
-                    forename: profile.forename,
-                    surname: profile.surname,
-                    birthdate: profile.birthdate,
-                    location: profile.location,
-                    avatar: profile.avatar_url ?
-                        {
-                            create:
-                                {
-                                    url: profile.avatar_url
-                                }
-                        } : undefined,
                     agent:
                         {
-                            connect:
-                                {
-                                    id: agent_id
-                                }
+                            id: agent_id
                         }
                 }
-        })
+        });
     }
 }

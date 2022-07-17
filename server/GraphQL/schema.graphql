@@ -1,0 +1,37 @@
+type Query
+{
+    byAgentId(agentId: Int): Profile
+
+    all(cardinality: Int): [Agent]
+}
+
+type Agent
+{
+    id: ID
+
+    forename: String
+    surname: String
+
+    username: String!
+    email: String!
+}
+
+type Profile
+{
+    id: ID
+    createdAt: String
+
+    forename: String
+    surname:  String
+
+    birthdate: String
+
+    location: String
+
+    avatar: Avatar
+}
+
+type Avatar
+{
+    url: String
+}
