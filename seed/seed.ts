@@ -1,10 +1,11 @@
-import {AgentManager, candidate_agent_type_} from "../database/managers/agent-manager";
 import {faker} from "@faker-js/faker";
-import {dbOperation_type_} from "../database/database-provider";
-import {Profile} from "@prisma/client";
-import {candidate_profile_type_} from "../database/managers/profile-manager";
 
-function createCandidates(forename: string = faker.name.firstName(), surname: string = faker.name.lastName()):
+import {AgentManager, candidate_agent_type_} from "../database/managers/agent-manager";
+import {candidate_profile_type_, ProfileManager} from "../database/managers/profile-manager";
+import {readdirSync} from "fs";
+import {dbOperation_type_} from "../database/database-provider";
+
+function randomCandidate(forename: string = faker.name.firstName(), surname: string = faker.name.lastName()):
     {
         agent: candidate_agent_type_;
         profile: candidate_profile_type_;
@@ -17,7 +18,6 @@ function createCandidates(forename: string = faker.name.firstName(), surname: st
 
     console.log(forename, surname, username, email, password, passkey);
 
-
     return {
         agent:
             {username, email, password, passkey},
@@ -27,10 +27,30 @@ function createCandidates(forename: string = faker.name.firstName(), surname: st
                 surname,
                 birthdate: faker.date.past().toISOString(),
                 location: faker.address.latitude() + "," + faker.address.longitude(),
-                avatar_url: "" //TODO
+                avatar_url: faker.helpers.arrayElement(readdirSync(__dirname + "/depot/avatar")) //TODO
             }
     }
 }
+
+export async function createRandomAgentAndProfile(agentManager: AgentManager, profileManager: ProfileManager): Promise<dbOperation_type_<any>>
+{
+    let candidate_ = randomCandidate();
+
+    let dbOperation_agent = await agentManager.insertAgent(candidate_.agent);
+
+    if (dbOperation_agent.payload)
+    {
+        let dbOperation_profile = await profileManager.insertProfile(candidate_.profile, dbOperation_agent.payload.id);
+
+        if (!dbOperation_profile)
+            return {error: "profileManager"}
+        else
+            return {error: ""}
+    } else
+        return {error: "agentManager"}
+}
+
+//TODO: finish here and ProfileResolvers
 //
 //
 // export async function createAgentRandom(agentManager: AgentManager): Promise<dbOperation_type_<Profile>
