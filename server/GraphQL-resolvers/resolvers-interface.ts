@@ -1,15 +1,15 @@
 import {combine} from "../../core/utilities/utilities";
 
-type resolver_type_ = (parent: any, args: any, context: any, info: any) => any
+type queryResolver_type = (parent: any, args: any, context: any, info: any) => any
 
-export type resolvers_type_ =
+export type queryResolvers_type =
     {
-        [resolver_ in string]: resolver_type_
+        [resolver_ in string]: queryResolver_type
     }
 
 export class Resolvers
 {
-    getQueryResolvers(): resolvers_type_
+    getQueryResolvers(): queryResolvers_type
     {
         return {}
     }

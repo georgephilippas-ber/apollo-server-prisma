@@ -7,7 +7,7 @@ type Query
 
 type Agent
 {
-    id: ID
+    id: Int
 
     forename: String
     surname: String
@@ -18,7 +18,7 @@ type Agent
 
 type Profile
 {
-    id: ID
+    id: Int
     createdAt: String
 
     forename: String

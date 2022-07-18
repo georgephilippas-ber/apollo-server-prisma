@@ -8,6 +8,8 @@ import {seedDatabase} from "./seed/seed";
 import {Server} from "./server/apollo-server";
 import {Routers} from "./server/REST-routers/router-interface";
 import {AuthorizationRouter} from "./server/REST-routers/routers/authorization/authorization-router";
+import {ProfileResolvers} from "./server/GraphQL-resolvers/profile-resolvers/profile-resolvers";
+import {ProfileManager} from "./database/managers/profile-manager";
 
 export class BerlinServer
 {
@@ -16,9 +18,12 @@ export class BerlinServer
     //
     agentManager: AgentManager;
     sessionManager: SessionManager;
+    profileManager: ProfileManager;
 
     //
     agentResolvers: AgentResolvers;
+    profileResolvers: ProfileResolvers;
+
     resolversCollection: ResolversCollection;
 
     //
@@ -33,9 +38,11 @@ export class BerlinServer
 
         this.agentManager = new AgentManager(prismaClient, this.jwtManager);
         this.sessionManager = new SessionManager(prismaClient, this.agentManager);
+        this.profileManager = new ProfileManager(prismaClient, this.agentManager);
 
         this.agentResolvers = new AgentResolvers(this.agentManager);
-        this.resolversCollection = new ResolversCollection([this.agentResolvers,]);
+        this.profileResolvers = new ProfileResolvers(this.profileManager);
+        this.resolversCollection = new ResolversCollection([this.agentResolvers, this.profileResolvers,]);
 
         this.authorizationRouter = new AuthorizationRouter(this.agentManager, this.sessionManager, this.jwtManager);
         this.routers = new Routers([this.authorizationRouter]);
@@ -45,7 +52,7 @@ export class BerlinServer
 
     async start(onSIGINT: boolean = true)
     {
-        await seedDatabase(this.agentManager, 0x02);
+        await seedDatabase(this.agentManager, this.profileManager, 0x04);
 
         if (onSIGINT)
             process.on("SIGINT", async args =>
