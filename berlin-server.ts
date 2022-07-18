@@ -64,6 +64,8 @@ export class BerlinServer
             {
                 await this.server.stop();
             });
+
+        return this.server.start();
     }
 
     async stop()

@@ -208,7 +208,7 @@ export class AuthorizationRouter extends RouterClass
             {
                 if (req.body.session)
                 {
-                    let session_: Session | null = (await this.sessionManager.deleteSessionById(req.body.session?.sessionId ?? -1)).payload;
+                    let session_: Session | undefined = (await this.sessionManager.deleteSessionById(req.body.session?.sessionId ?? -1)).payload;
 
                     if (!session_ || (session_.agentId !== req.body.session?.agentId))
                         res.status(StatusCodes.OK).send({status: "invalid session"});

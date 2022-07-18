@@ -27,7 +27,7 @@ function randomCandidate(forename: string = faker.name.firstName(), surname: str
                 surname,
                 birthdate: faker.date.past().toISOString(),
                 location: faker.address.latitude() + "," + faker.address.longitude(),
-                avatar_url: faker.helpers.arrayElement(readdirSync(__dirname + "/depot/avatar")) //TODO
+                avatar_url: faker.helpers.arrayElement(readdirSync(__dirname + "/../depot/avatar")) //TODO
             }
     }
 }
@@ -50,9 +50,21 @@ export async function createOne(agentManager: AgentManager, profileManager: Prof
         return {error: "agentManager"}
 }
 
-export async function createMany(agentManager: AgentManager, profileManager: ProfileManager, cardinality: number): Promise<dbOperation_type_<never>[]>
+export async function createMany(agentManager: AgentManager, profileManager: ProfileManager, cardinality: number): Promise<dbOperation_type_<never>[] | null>
 {
-    return Promise.all(Array(cardinality).fill(0).map(value => createOne(agentManager, profileManager)));
+    // return Promise.all(Array(cardinality).fill(0).map(value => createOne(agentManager, profileManager)));
+
+    for (let i_ = 0; i_ < cardinality; i_++)
+    {
+        let dbOperation = await createOne(agentManager, profileManager);
+
+        if (!dbOperation.payload)
+        {
+            console.log(dbOperation.error);
+        }
+    }
+
+    return null;
 }
 
 
@@ -61,5 +73,5 @@ export async function seedDatabase(agentManager: AgentManager, profileManager: P
     await agentManager.delete_all();
     await profileManager.delete_all();
 
-    (await createMany(agentManager, profileManager, cardinality)).filter(value => value.error).forEach(value => console.log(value.error));
+    await createMany(agentManager, profileManager, cardinality);
 }

@@ -21,7 +21,7 @@ export class SessionManager
         return this.prismaClient.session.findMany();
     }
 
-    async createSession(agent_id_: number, expiresIn: number): Promise<dbOperation_type_>
+    async createSession(agent_id_: number, expiresIn: number): Promise<dbOperation_type_<Session>>
     {
         if (!(await this.agentManager.byId(agent_id_)))
             return {
@@ -54,7 +54,7 @@ export class SessionManager
         }
     }
 
-    async deleteSessionById(id: number): Promise<dbOperation_type_>
+    async deleteSessionById(id: number): Promise<dbOperation_type_<Session>>
     {
         if (id >= 0)
         {

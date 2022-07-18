@@ -30,7 +30,7 @@ export class Server
         this.port = port;
 
         this.apollo_server = new ApolloServer({
-            typeDefs: buildSchema(readFileSync(__dirname + "/../models/GraphQL/schema.graphql").toString("utf-8")),
+            typeDefs: buildSchema(readFileSync(__dirname + "/GraphQL/schema.graphql").toString("utf-8")),
             resolvers: resolvers_collection_.collectQueryResolvers(),
             csrfPrevention: true,
             cache: "bounded",
