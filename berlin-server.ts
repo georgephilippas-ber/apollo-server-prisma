@@ -1,15 +1,20 @@
-import {JwtManager} from "./core/authorization/jwt-manager/jwt-manager";
-import {AgentManager} from "./database/managers/agent-manager";
 import {prismaClient} from "./database/database-provider";
+
+import {AgentManager} from "./database/managers/agent-manager";
+import {JwtManager} from "./core/authorization/jwt-manager/jwt-manager";
 import {SessionManager} from "./database/managers/session-manager";
+import {ProfileManager} from "./database/managers/profile-manager";
+
 import {ResolversCollection} from "./server/GraphQL-resolvers/resolvers-interface";
 import {AgentResolvers} from "./server/GraphQL-resolvers/agent-resolvers/agent-resolvers";
-import {seedDatabase} from "./seed/seed";
+import {ProfileResolvers} from "./server/GraphQL-resolvers/profile-resolvers/profile-resolvers";
+
 import {Server} from "./server/apollo-server";
 import {Routers} from "./server/REST-routers/router-interface";
+
 import {AuthorizationRouter} from "./server/REST-routers/routers/authorization/authorization-router";
-import {ProfileResolvers} from "./server/GraphQL-resolvers/profile-resolvers/profile-resolvers";
-import {ProfileManager} from "./database/managers/profile-manager";
+
+import {seedDatabase} from "./seed/seed";
 
 export class BerlinServer
 {
