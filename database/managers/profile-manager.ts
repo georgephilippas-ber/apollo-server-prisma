@@ -76,6 +76,19 @@ export class ProfileManager
         });
     }
 
+    async byAgentUsername(username: string): Promise<Profile | null>
+    {
+        return this.prismaClient.profile.findFirst({
+            where:
+                {
+                    agent:
+                        {
+                            username
+                        }
+                }
+        })
+    }
+
     async delete_all()
     {
         return this.prismaClient.profile.deleteMany();
