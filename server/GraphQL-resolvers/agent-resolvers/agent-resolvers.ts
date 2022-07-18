@@ -17,7 +17,7 @@ export class AgentResolvers extends Resolvers
     getQueryResolvers(): queryResolvers_type
     {
         return {
-            all: (parent, args) => this.agentManager.all(args.cardinality)
+            allAgents: (parent, args) => this.agentManager.all(args.cardinality)
         }
     }
 }

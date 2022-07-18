@@ -1,9 +1,9 @@
 type Query
 {
-    byAgentId(agentId: Int): Profile
-    byUsername(username: String): Profile
+    profileByAgentId(agentId: Int): Profile
+    profileByUsername(username: String): Profile
 
-    all(cardinality: Int): [Agent]
+    allAgents(cardinality: Int): [Agent]
 }
 
 type Agent
