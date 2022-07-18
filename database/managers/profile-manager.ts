@@ -75,4 +75,9 @@ export class ProfileManager
                 }
         });
     }
+
+    async delete_all()
+    {
+        return this.prismaClient.profile.deleteMany();
+    }
 }

@@ -32,7 +32,7 @@ function randomCandidate(forename: string = faker.name.firstName(), surname: str
     }
 }
 
-export async function createRandomAgentAndProfile(agentManager: AgentManager, profileManager: ProfileManager): Promise<dbOperation_type_<any>>
+export async function createOne(agentManager: AgentManager, profileManager: ProfileManager): Promise<dbOperation_type_<never>>
 {
     let candidate_ = randomCandidate();
 
@@ -50,23 +50,16 @@ export async function createRandomAgentAndProfile(agentManager: AgentManager, pr
         return {error: "agentManager"}
 }
 
-//TODO: finish here and ProfileResolvers
-//
-//
-// export async function createAgentRandom(agentManager: AgentManager): Promise<dbOperation_type_<Profile>
-// {
-//
-//     return agentManager.insertAgent(candidateAgentRandom());
-// }
-//
-// export async function createManyAgentRandom(agentManager: AgentManager, cardinality: number): Promise<dbOperation_type_[]>
-// {
-//     return Promise.all(Array(cardinality).fill(0).map(value => createAgentRandom(agentManager)));
-// }
-//
-// export async function seedDatabase(agentManager: AgentManager, cardinality: number = 0x04)
-// {
-//     await agentManager.delete_all();
-//
-//     (await createManyAgentRandom(agentManager, cardinality)).filter(value => value.error).forEach(value => console.log(value.error));
-// }
+export async function createMany(agentManager: AgentManager, profileManager: ProfileManager, cardinality: number): Promise<dbOperation_type_<never>[]>
+{
+    return Promise.all(Array(cardinality).fill(0).map(value => createOne(agentManager, profileManager)));
+}
+
+
+export async function seedDatabase(agentManager: AgentManager, profileManager: ProfileManager, cardinality: number = 0x04)
+{
+    await agentManager.delete_all();
+    await profileManager.delete_all();
+
+    (await createMany(agentManager, profileManager, cardinality)).filter(value => value.error).forEach(value => console.log(value.error));
+}
