@@ -72,6 +72,10 @@ export class ProfileManager
                         {
                             id: agent_id
                         }
+                },
+            include:
+                {
+                    avatar: true
                 }
         });
     }
@@ -85,8 +89,18 @@ export class ProfileManager
                         {
                             username
                         }
+                },
+            include:
+                {
+                    avatar: true
                 }
+
         })
+    }
+
+    async all(): Promise<Profile[]>
+    {
+        return this.prismaClient.profile.findMany({include: {avatar: true, agent: false}});
     }
 
     async delete_all()

@@ -4,6 +4,7 @@ import {AgentManager, candidate_agent_type_} from "../database/managers/agent-ma
 import {candidate_profile_type_, ProfileManager} from "../database/managers/profile-manager";
 import {readdirSync} from "fs";
 import {dbOperation_type_} from "../database/database-provider";
+import path from "path";
 
 function randomCandidate(forename: string = faker.name.firstName(), surname: string = faker.name.lastName()):
     {
@@ -27,7 +28,7 @@ function randomCandidate(forename: string = faker.name.firstName(), surname: str
                 surname,
                 birthdate: faker.date.past().toISOString(),
                 location: faker.address.latitude() + "," + faker.address.longitude(),
-                avatar_url: faker.helpers.arrayElement(readdirSync(__dirname + "/../depot/avatar")) //TODO
+                avatar_url: path.join("avatar", faker.helpers.arrayElement(readdirSync(__dirname + "/../depot/avatar")))
             }
     }
 }

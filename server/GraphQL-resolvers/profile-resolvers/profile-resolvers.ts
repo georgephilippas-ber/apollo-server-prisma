@@ -16,7 +16,8 @@ export class ProfileResolvers extends Resolvers
     {
         return {
             profileByAgentId: (parent, args) => this.profileManager.byAgentId(args.agentId),
-            profileByUsername: (parent, args) => this.profileManager.byAgentUsername(args.username)
+            profileByUsername: (parent, args) => this.profileManager.byAgentUsername(args.username),
+            allProfiles: (parent, args) => this.profileManager.all()
         }
     }
 }

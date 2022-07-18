@@ -4,6 +4,7 @@ type Query
     profileByUsername(username: String): Profile
 
     allAgents(cardinality: Int): [Agent]
+    allProfiles: [Profile]
 }
 
 type Agent
