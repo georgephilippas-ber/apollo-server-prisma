@@ -28,7 +28,7 @@ export function authorizationJsonWebTokenMiddleware(jwtManager: JwtManager)
     async function middleware(req: Request, res: Response, next: NextFunction)
     {
         let token_: string = getAuthorizationToken(req);
-
+        console.log("token", token_);
         if (token_)
         {
             let jwtDecode = jwtManager.decode(token_);
@@ -77,7 +77,7 @@ async function createSession(agentId: number, sessionManager: SessionManager, jw
             canRefresh: true,
         }, session_duration_);
 
-        response_.status(StatusCodes.OK).send({token, ...additionalResponseBodyContents});
+        response_.status(StatusCodes.OK).send({token, agentId, ...additionalResponseBodyContents});
     }
 
     await sessionManager.deleteExpiredSessions(agentId);

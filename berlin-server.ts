@@ -57,7 +57,7 @@ export class BerlinServer
 
     async start(onSIGINT: boolean = true)
     {
-        await seedDatabase(this.agentManager, this.profileManager, 0x04);
+        await seedDatabase(this.agentManager, this.profileManager);
 
         if (onSIGINT)
             process.on("SIGINT", async args =>

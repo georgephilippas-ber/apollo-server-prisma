@@ -57,7 +57,7 @@ export async function createMany(agentManager: AgentManager, profileManager: Pro
         await createOne(agentManager, profileManager);
 }
 
-export async function seedDatabase(agentManager: AgentManager, profileManager: ProfileManager, cardinality: number = 0x04)
+export async function seedDatabase(agentManager: AgentManager, profileManager: ProfileManager, cardinality: number = 0x01)
 {
     await agentManager.delete_all();
     await profileManager.delete_all();

@@ -20,13 +20,12 @@ Content-Type: application/json
 }
 
 ### login
-POST http://localhost:4000/authentication/login
+POST http://localhost:4000/authorization/login
 Content-Type: application/json
 
 {
   "credentials": [
-    "georg",
-    "georg"
+    "johann13@yahoo.com", "johann.barton"
   ]
 }
 

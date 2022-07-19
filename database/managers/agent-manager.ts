@@ -64,7 +64,7 @@ export class AgentManager
                                     username: candidate_agent.username,
                                     email: candidate_agent.email,
                                     password_hash: Encryption.hash(candidate_agent.password),
-                                    passkey_hash: candidate_agent.passkey ? Encryption.hash(candidate_agent.passkey) : undefined,
+                                    passkey_hash: candidate_agent.passkey,
                                     active,
                                 }
                         }
@@ -95,9 +95,7 @@ export class AgentManager
 
     async byPasskey(passkey: string): Promise<Agent | null>
     {
-        let passkey_hash = Encryption.hash(passkey);
-
-        return this.prismaClient.agent.findUnique({where: {passkey_hash}})
+        return this.prismaClient.agent.findUnique({where: {passkey_hash: passkey}})
     }
 
     async deleteBy(identifier: string): Promise<dbOperation_type_<Agent>>
@@ -164,14 +162,18 @@ export class AgentManager
 
     async authenticate(credentials: string[]): Promise<Agent | null>
     {
-        let agent_: Agent | null = null;
+        let agent_: Agent | null;
 
         if (credentials.length > 1)
             agent_ = await this.authenticateUsingPassword(credentials)
         else if (this.jwtManager.decode(credentials[0]).isAuthorizationPayload)
+        {
             agent_ = await this.authenticateUsingToken(credentials);
-        else
+        } else
+        {
             agent_ = await this.authenticateUsingPasskey(credentials);
+        }
+
 
         return agent_?.active ? agent_ : null;
     }

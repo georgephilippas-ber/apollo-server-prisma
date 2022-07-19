@@ -8,6 +8,8 @@ import {ResolversCollection} from "./GraphQL-resolvers/resolvers-interface";
 import {RouterClass, Routers} from "./REST-routers/router-interface";
 import {urlJoin} from "url-join-ts";
 
+import cors from "cors"
+
 export class Server
 {
     express_application: Express;
@@ -23,6 +25,7 @@ export class Server
     {
         this.express_application = express();
 
+        this.express_application.use(cors());
         this.express_application.use(express.static("depot"));
 
         this.http_server = http.createServer(this.express_application);
