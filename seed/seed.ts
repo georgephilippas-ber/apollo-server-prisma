@@ -51,23 +51,11 @@ export async function createOne(agentManager: AgentManager, profileManager: Prof
         return {error: "agentManager"}
 }
 
-export async function createMany(agentManager: AgentManager, profileManager: ProfileManager, cardinality: number): Promise<dbOperation_type_<never>[] | null>
+export async function createMany(agentManager: AgentManager, profileManager: ProfileManager, cardinality: number)
 {
-    // return Promise.all(Array(cardinality).fill(0).map(value => createOne(agentManager, profileManager)));
-
     for (let i_ = 0; i_ < cardinality; i_++)
-    {
-        let dbOperation = await createOne(agentManager, profileManager);
-
-        if (!dbOperation.payload)
-        {
-            console.log(dbOperation.error);
-        }
-    }
-
-    return null;
+        await createOne(agentManager, profileManager);
 }
-
 
 export async function seedDatabase(agentManager: AgentManager, profileManager: ProfileManager, cardinality: number = 0x04)
 {
