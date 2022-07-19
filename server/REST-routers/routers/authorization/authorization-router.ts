@@ -23,7 +23,7 @@ let session_duration_: number = 0x0f;
 let geheimnis_: string = "berlin";
 
 
-export function authorizationJsonWebTokenMiddleware(jwtManager: JwtManager)
+export function sessionJwt_middleware(jwtManager: JwtManager)
 {
     async function middleware(req: Request, res: Response, next: NextFunction)
     {
@@ -100,7 +100,8 @@ export class AuthorizationRouter extends RouterClass
         this.express_router_.use(morgan("short"));
         this.express_router_.use(cors());
         this.express_router_.use(express.json());
-        this.express_router_.use(authorizationJsonWebTokenMiddleware(jwtManager));
+
+        this.express_router_.use(sessionJwt_middleware(jwtManager));
 
         this.use();
     }
