@@ -22,13 +22,12 @@ let session_duration_: number = 0x0f;
 
 let geheimnis_: string = "berlin";
 
-
 export function sessionJwt_middleware(jwtManager: JwtManager)
 {
     async function middleware(req: Request, res: Response, next: NextFunction)
     {
         let token_: string = getAuthorizationToken(req);
-        console.log("token", token_);
+
         if (token_)
         {
             let jwtDecode = jwtManager.decode(token_);
@@ -126,7 +125,7 @@ export class AuthorizationRouter extends RouterClass
         this.express_router_.all("/", (req, res) =>
         {
             res.send({...req.headers});
-        })
+        });
     }
 
     register()
